@@ -1,3 +1,5 @@
+console.log("table filter to be added");
+
 const Confirm = {
   open(options) {
     options = Object.assign(

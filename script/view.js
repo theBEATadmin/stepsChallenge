@@ -75,7 +75,6 @@ const Confirm = {
         this._close(confirmEl);
       });
     }
-    alert("HACKED");
 
     // [btnCancel, btnClose].forEach((el) => {
     //   el.addEventListener("click", () => {

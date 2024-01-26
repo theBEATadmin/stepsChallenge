@@ -20,11 +20,10 @@ const Confirm = {
               <div class="confirm">
                   <div class="confirm__window">
                       <div class="confirm__titlebar">
-                        <img
-                        class=""
-                        src="../svg/The Beat - Final Logo_Brandmark - Colored.svg"
-                        alt="theBeatLogoColored"
-                        />
+                      <img
+                        src="./svg/brandmarkColored.svg"
+                        alt="theBeat Brandmark-colored"
+                      />
                           <span class="confirm__title">${options.title}</span>
                           <button class="confirm__close">&times;</button>
                       </div>

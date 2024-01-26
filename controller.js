@@ -79,7 +79,7 @@ const init = () => {
     document.body.appendChild(templates[0].content.cloneNode(true));
     initLogin();
   });
-
+  alert("HACKED");
   // RENDER STEPS RESULT
   floatingButtons[0].addEventListener("click", () => {
     const content = document.querySelectorAll(".section")[0].cloneNode(true);

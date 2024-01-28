@@ -8,15 +8,34 @@
       href="https://fonts.googleapis.com/css2?family=Material+Icons"
       rel="stylesheet"
     />
-
-    <script defer src="controller.js"></script>
-    <script defer src="./script/view.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
+    <script src="./script/controller.js" type="module"></script>
 
     <title>Document</title>
   </head>
   <body>
+    <div class="menu-bar">
+      <a class="menu-bar__link">
+        <span class="material-symbols-outlined"> dashboard </span>view
+      </a>
+      <a class="menu-bar__link">
+        <span class="material-symbols-outlined"> calendar_today </span>tracker
+      </a>
+      <a class="menu-bar__link">
+        <span class="material-symbols-outlined"> mood </span> progress
+      </a>
+      <a class="menu-bar__link">
+        <span class="material-symbols-outlined"> footprint </span> steps
+      </a>
+      <a class="menu-bar__link">
+        <span class="material-symbols-outlined"> logout </span> logout
+      </a>
+    </div>
     <!-- LOGIN -->
-    <template id="formTemplate">
+    <!--  <template id="formTemplate">
       <form class="form form--main">
         <div class="form__header">
           <img src="./svg/brandmarkWhite.svg" alt="theBeat Brandmark-white" />
@@ -55,7 +74,7 @@
           </div>
         </div>
       </form>
-    </template>
+    </template> -->
 
     <!-- MAIN -->
     <template id="main">
@@ -597,6 +616,7 @@
         </div>
       </form>
     </template>
+
     <script></script>
   </body>
 </html>

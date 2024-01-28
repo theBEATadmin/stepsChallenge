@@ -1,5 +1,3 @@
-console.log("table filter to be added");
-
 const Confirm = {
   open(options) {
     options = Object.assign(
@@ -95,35 +93,3 @@ const Confirm = {
     });
   },
 };
-
-class Spinner {
-  constructor(options) {
-    this.options = Object.assign(
-      {},
-      {
-        container: document.body,
-        spinner: document.createElement("div"),
-        timeout: 1000,
-        callback: () => {},
-      },
-      options
-    );
-
-    this.options.spinner.className = "overlay";
-    this.options.spinner.innerHTML = `<div class="spinner"></div>`;
-
-    this.options.container.insertAdjacentElement(
-      "afterbegin",
-      this.options.spinner
-    );
-
-    this._remove();
-  }
-
-  _remove() {
-    setTimeout(() => {
-      this.options.callback();
-      this.options.spinner.remove();
-    }, this.options.timeout);
-  }
-}

@@ -99,7 +99,7 @@ body * {
 }
 .header > hr {
   border: none;
-  border-left: 1px solid var(--blue-lighter);
+  border-left: 1px solid var(--gray-light);
 }
 .header__info {
   flex-grow: 1;
@@ -369,7 +369,7 @@ body * {
 }
 .table tbody tr.active-row td {
   font-weight: 600;
-  color: var(--blue);
+  color: var(--green);
 }
 /* CALENDAR */
 .calendar {
@@ -380,6 +380,7 @@ body * {
 
 .calendar__header {
   position: relative;
+  width: 100%;
   padding: 0 3.2px;
 }
 .month {
@@ -470,56 +471,96 @@ body * {
 
 .day {
   position: relative;
-  display: inline-flex;
+  /* display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  margin: 5px 2.4px;
+ */
+  margin: 12px 2.4px;
   /* calender width() - (weekdays horizontal padding( )x2)  */
   width: calc((var(--width) - ((3.2px * 2) + (2.4px * 7 * 2))) / 7);
-  font-weight: 300;
-
+  font-weight: 400;
+  text-align: center;
+  /*  border: 1px solid var(--gray-light);
+ */
   transition: 0.2s ease-in-out;
-}
-.day--today {
-  font-weight: 500;
-  color: var(--orange);
 }
 .day--previous,
 .day--next {
-  opacity: 0.35;
+  opacity: 0.5;
 }
-.date-number {
-  font-weight: 400;
-  font-size: var(--font-size-small);
-  color: var(--gray-dark);
-}
-.marker {
-  font-size: var(--font-size-small);
-  color: var(--gray-lighter);
-}
-.marker::before {
-  content: "\e5ca";
+.day::before {
+  content: "";
   font-family: "Material Icons";
+  position: absolute;
+  left: 0;
+  right: 0;
+
+  text-align: center;
+  top: -15px;
 }
-.marker::after {
+.day--checked::before {
+  content: "\e876";
+  color: rgba(25, 135, 84, 1);
+}
+.day--starred::before {
   content: "\f0ec";
   font-family: "Material Icons";
-}
-.marker--starred::after {
   color: rgba(255, 193, 7, 1);
 }
-.marker--checked::before {
-  color: rgba(25, 135, 84, 1);
+.day--neither::before {
+  content: "\e14c";
+  font-family: "Material Icons";
+  color: #dc3545;
+}
+.date-number {
+  position: relative;
+  font-weight: 400;
+  font-size: 0.9rem;
+  height: 100%;
+  width: 100%;
+  color: var(--gray-dark);
+  text-align: center;
+}
+.today {
+  font-weight: 600;
+  text-decoration: underline solid;
 }
 .day__content:hover {
   font-weight: 600;
   cursor: pointer;
 }
-.calendar__button {
-  padding: 15px 30px 30px 30px;
-  background: var(--secondary);
+
+.calendar__footer {
+  margin: var(--margin);
+  display: flex;
+  flex-direction: column;
+}
+.calendar__footer > span,
+.calendar__footer > span > strong {
+  font-size: 0.75rem;
+  color: var(--gray-dark);
+}
+.calendar__footer > span:not(:last-of-type) {
+  margin-bottom: var(--margin);
+}
+.calendar__footer > span::before {
+  font-family: "Material Icons";
+}
+.calendar__footer > span:nth-of-type(1)::before {
+  content: "\f0ec";
+  font-family: "Material Icons";
+  color: rgba(255, 193, 7, 1);
+}
+.calendar__footer > span:nth-of-type(2)::before {
+  content: "\e876";
+
+  color: rgba(25, 135, 84, 1);
+}
+.calendar__footer > span:nth-of-type(3)::before {
+  content: "\e14c";
+  font-family: "Material Icons";
+  color: #dc3545;
 }
 .mab-container {
   flex-grow: 1;
@@ -731,6 +772,12 @@ body * {
 .form--main {
   margin-top: 60px;
   box-shadow: var(--box-shadow);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
 }
 
 .form__header {
@@ -1121,9 +1168,6 @@ body * {
 }
 /* MOBILE VIEW */
 @media only screen and (max-width: 1020px) {
-  body {
-    /* padding-bottom: calc(var(--padding) * 1.5); */
-  }
   .main {
     height: 100%;
     grid-template-columns: 1fr 1fr;
@@ -1149,6 +1193,7 @@ body * {
   }
   .main {
     display: block;
+    padding-left: 0;
   }
   .section:not(:last-child) {
     margin-bottom: var(--margin);

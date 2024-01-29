@@ -3,7 +3,6 @@ export default class MenuView {
     this.options = Object.assign(
       {},
       {
-        container: document.body,
         element: document.createElement("div"),
         callbackButton1: () => {},
         callbackButton2: () => {},
@@ -17,24 +16,23 @@ export default class MenuView {
     this.options.element.className = "mab-container";
     this.options.element.insertAdjacentHTML(
       `afterbegin`,
-      `<div class="mab">
-      <button type="button" class="mab__button mab__button--menu">
-        <span class="material-icons mab__icon">menu</span>
-      </button>
-
-      <div class="mab__list">
-        <button type="button" class="mab__button mab__button--secondary">
-          <span class="mab__text">Record Steps</span>
-        </button>
-        <button type="button" class="mab__button mab__button--secondary">
-          <span class="mab__text">Update Tracker</span>
-        </button>
-
-        <button type="button" class="mab__button mab__button--secondary">
-          <span class="mab__text">Logout</span>
-        </button>
-      </div>
-    </div>`
+      `<div class="menu-bar">
+    <a class="menu-bar__link">
+      <span class="material-symbols-outlined"> dashboard </span>view
+    </a>
+    <a class="menu-bar__link">
+      <span class="material-symbols-outlined"> calendar_today </span>tracker
+    </a>
+    <a class="menu-bar__link">
+      <span class="material-symbols-outlined"> mood </span> progress
+    </a>
+    <a class="menu-bar__link">
+      <span class="material-symbols-outlined"> footprint </span> steps
+    </a>
+    <a class="menu-bar__link">
+      <span class="material-symbols-outlined"> logout </span> logout
+    </a>
+  </div>`
     );
 
     this.options.container.insertAdjacentElement(
@@ -46,44 +44,24 @@ export default class MenuView {
   }
 
   _addListener() {
-    // ENABALE ALL MENU BUTTONS
-    this.options.element.querySelectorAll(".mab").forEach((multiAction) => {
-      const menuButton = multiAction.querySelector(".mab__button--menu");
-      const list = multiAction.querySelector(".mab__list");
+    const menuButtons =
+      this.options.element.querySelectorAll(".menu-bar__link");
 
-      menuButton.addEventListener("click", () => {
-        list.classList.toggle("mab__list--visible");
-      });
-    });
-
-    // HIDE ALL LIST WHEN CLICKING ELSEWHERE ON THE PAGE
-    document.addEventListener("click", (e) => {
-      const keepOpen =
-        e.target.matches(".mab__list") ||
-        e.target.matches(".mab__button--menu") ||
-        e.target.closest(".mab__icon");
-
-      if (keepOpen) return;
-
-      document.querySelectorAll(".mab__list").forEach((list) => {
-        list.classList.remove("mab__list--visible");
-      });
-    });
-
-    const mabButtons = this.options.element.querySelectorAll(
-      ".mab__button--secondary"
-    );
-
-    mabButtons[0].addEventListener("click", (e) => {
+    menuButtons[0].addEventListener("click", (e) => {
       this.options.callbackButton1();
     });
 
-    mabButtons[1].addEventListener("click", (e) => {
+    menuButtons[1].addEventListener("click", (e) => {
+      this.options.callbackButton2();
+    });
+    menuButtons[2].addEventListener("click", (e) => {
+      this.options.callbackButton2();
+    });
+    menuButtons[3].addEventListener("click", (e) => {
       this.options.callbackButton2();
     });
 
-    mabButtons[2].addEventListener("click", (e) => {
-      this.options.element.remove();
+    menuButtons[4].addEventListener("click", (e) => {
       this.options.callbackLogout();
     });
   }

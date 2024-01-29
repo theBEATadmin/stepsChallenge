@@ -8,8 +8,9 @@ import Menu from "./views/menuview.js";
 import MainView from "./views/mainview.js";
 import Dashboard from "./views/dashboardview.js";
 import Table from "./views/tableview.js";
+import Calendar from "./views/calendarview.js";
 
-let login, spinner, main, menu, dashboard, table, sections;
+let login, spinner, main, menu, dashboard, table, calendar, sections;
 // https://script.google.com/macros/s/AKfycbzwSUvHiomI_m_FelXVgKHRSaq7iAw1QpDZq3jXzT3Fh9eXY7bW6OEFXiO1b6AUG5LO5w/exec
 
 // const initLogin = () => {
@@ -147,6 +148,7 @@ const renderMain = () => {
       renderMenu();
       renderDashboard();
       renderTable();
+      renderCalendar();
     },
   });
 
@@ -193,6 +195,14 @@ const renderTable = () => {
   table.addRow();
 };
 
+// CALENDAR
+const renderCalendar = () => {
+  new Calendar({
+    container: sections[2],
+    element: document.createElement("div"),
+    data: model.state.calendar,
+  });
+};
 const init = () => {
   // SPINNER
   spinner = new Spinner({

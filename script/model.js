@@ -28,6 +28,7 @@ export let state = {
     header: [],
     rows: [],
   },
+  calendar: [],
 };
 
 export const loadData = async function (params) {
@@ -52,8 +53,8 @@ export const loadData = async function (params) {
     state = {};
     state = data.data;
 
+    // ARRANGE DATA IF THERE ARE STEPS RECORD
     if (state.steps.length !== 0) {
-      // ARRANGE DATA
       state.userData.steps = getUserData(state.steps);
       state.userData.tracker = getUserData(state.tracker);
       // state.participants.steps = getParticipantsData(state.steps);
@@ -64,8 +65,8 @@ export const loadData = async function (params) {
       state.table.rows = getTableRows(state.steps);
     }
 
+    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
     if (state.userData.steps.length) {
-      //PROCESS DATA FOR DASHBOARD
       state.dashboard.count = state.participants.names.length;
       state.dashboard.steps = getStepsToday();
       state.dashboard.totSteps = computeTotSteps("steps");
@@ -77,6 +78,12 @@ export const loadData = async function (params) {
       )[0];
     }
 
+    //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
+    //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
+    if (state.userData.tracker.length) {
+      state.calendar = getCalendarDates();
+      console.log("calendar");
+    }
     localStorage.setItem("state", JSON.stringify(state));
   } catch (error) {
     throw Error(error);
@@ -92,7 +99,7 @@ export const isLoggedIn = () => {
   if (JSON.parse(localStorage.getItem("state"))) {
     state = JSON.parse(localStorage.getItem("state"));
     state.table.rows = getTableRows(state.steps);
-
+    console.log(state.userData.tracker);
     return true;
   }
 };
@@ -110,47 +117,12 @@ const getUserData = (arr) => {
   return arr.filter((datum) => datum.username == state.username);
 };
 
-// const getParticipantsData = (data) => {
-//   // let uniqueArr = [];
-
-//   // GET UNIQUE PARTICIPANT
-//   // data.forEach((datum) => {
-//   //   if (state.uniqueArr.name.indexOf(datum.username) == -1)
-//   //     state.uniqueArr.name.push(datum.username);
-//   // });
-
-//   return state.participants.name.map((datumA) => {
-//     let obj = { [datumA]: {} };
-//     const records = data.filter((datumB) => {
-//       return datumB.username == datumA;
-//     });
-
-//     obj[datumA]["steps"] = records.reduce((acc, rec) => {
-//       return (acc += rec.steps);
-//     }, 0);
-
-//     obj[datumA]["minutes"] = records.reduce((acc, rec) => {
-//       return (acc += rec.minutes);
-//     }, 0);
-
-//     return obj;
-//   });
-// };
-
-// TABLE FUNCTION
+// TABLE DATA FUNCTION
 const getTableRows = (data) => {
-  // let uniqueArr = [];
-
-  // GET UNIQUE PARTICIPANT
-  /*  data.forEach((datum) => {
-    if (uniqueArr.indexOf(datum.username) == -1) uniqueArr.push(datum.username);
-  }); */
-
   // GET THE USERNAME, COACH AND SUM OF THE TOTAL STEPS  OF EACH PARTICIPANT
   let tableRow = state.participants.names.map((datumA) => {
     // GET ALL RECORDS OF USER
     let records = data.filter((datumB) => datumA.name === datumB.username);
-    console.log(datumA);
     return [
       datumA.name,
       records?.reduce((tot, acc) => (tot += acc.steps), 0),
@@ -188,7 +160,7 @@ const getTableRows = (data) => {
   return tableRow;
 };
 
-// DASHBOAR DATA FUNCTIONS
+// DASHBOARD DATA FUNCTIONS
 const getStepsToday = () => {
   const result = state.userData.steps.find((datum) => {
     if (shortDateFormat.format(new Date(datum.date)) == state.date)
@@ -208,4 +180,38 @@ const computeAvgSteps = (str) => {
   if (state.userData.steps.length == 0 || isNaN(state.dashboard[str]))
     return "-";
   return state.dashboard[str] / state.userData.steps.length;
+};
+
+// CALENDAR DATA FUNCTION
+const getCalendarDates = () => {
+  const stringToTime = (str) => {
+    const date = new Date(str);
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      0,
+      0,
+      0
+    ).getTime();
+  };
+  const responses = [
+    "completed my steps",
+    "joined a class or a workout",
+    "completed my steps and joined or workout",
+    "won't able to do either",
+  ];
+
+  return state.userData.tracker.map((datum) => {
+    return {
+      date: stringToTime(datum.date),
+      responseIndex: responses.findIndex(
+        (response) =>
+          response.toLocaleLowerCase().replace(/\s/, "") ==
+          datum.activity.toLocaleLowerCase().replace(/\s/, "")
+      ),
+    };
+  });
+
+  console.log(test);
 };

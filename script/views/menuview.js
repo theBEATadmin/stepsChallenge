@@ -6,6 +6,8 @@ export default class MenuView {
         element: document.createElement("div"),
         callbackButton1: () => {},
         callbackButton2: () => {},
+        callbackButton3: () => {},
+        callbackButton4: () => {},
         callbackLogout: () => {},
       },
       options
@@ -17,21 +19,21 @@ export default class MenuView {
     this.options.element.insertAdjacentHTML(
       `afterbegin`,
       `<div class="menu-bar">
-    <a class="menu-bar__link">
+    <span class="menu-bar__link">
       <span class="material-symbols-outlined"> dashboard </span>view
-    </a>
-    <a class="menu-bar__link">
+    </span>
+    <span class="menu-bar__link">
       <span class="material-symbols-outlined"> calendar_today </span>tracker
-    </a>
-    <a class="menu-bar__link">
+    </span>
+    <span class="menu-bar__link">
       <span class="material-symbols-outlined"> mood </span> progress
-    </a>
-    <a class="menu-bar__link">
+    </span>
+    <span class="menu-bar__link">
       <span class="material-symbols-outlined"> footprint </span> steps
-    </a>
-    <a class="menu-bar__link">
+    </span>
+    <span class="menu-bar__link">
       <span class="material-symbols-outlined"> logout </span> logout
-    </a>
+    </span>
   </div>`
     );
 
@@ -55,10 +57,10 @@ export default class MenuView {
       this.options.callbackButton2();
     });
     menuButtons[2].addEventListener("click", (e) => {
-      this.options.callbackButton2();
+      this.options.callbackButton3();
     });
     menuButtons[3].addEventListener("click", (e) => {
-      this.options.callbackButton2();
+      this.options.callbackButton4();
     });
 
     menuButtons[4].addEventListener("click", (e) => {

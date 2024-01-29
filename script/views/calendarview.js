@@ -56,10 +56,10 @@ export default class Calendar {
       </div>
       <div class="calendar__footer">
         <span class="footer1">
-            completed my steps <strong>AND</strong> joined or workout
+            completed my steps <strong>AND</strong> joined a class or a workout
         </span>
         <span class="footer2">
-            completed my steps | joined a class <strong>OR</strong> a workout
+            completed my steps <strong>OR</strong> joined a class or a workout
         </span>
         <span class="footer3">
             won't able to do either
@@ -223,5 +223,9 @@ export default class Calendar {
         return;
       }
     });
+  }
+
+  import() {
+    return this.options.element.innerHTML;
   }
 }

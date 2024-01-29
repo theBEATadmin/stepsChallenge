@@ -9,8 +9,20 @@ import MainView from "./views/mainview.js";
 import Dashboard from "./views/dashboardview.js";
 import Table from "./views/tableview.js";
 import Calendar from "./views/calendarview.js";
+import Confirm from "./views/confirmview.js";
+import StepsForm from "./views/stepsform.js";
+import TrackerForm from "./views/trackerform.js";
 
-let login, spinner, main, menu, dashboard, table, calendar, sections;
+let login,
+  spinner,
+  main,
+  menu,
+  dashboard,
+  table,
+  calendar,
+  stepsform,
+  trackerform;
+let sections;
 // https://script.google.com/macros/s/AKfycbzwSUvHiomI_m_FelXVgKHRSaq7iAw1QpDZq3jXzT3Fh9eXY7bW6OEFXiO1b6AUG5LO5w/exec
 
 // const initLogin = () => {
@@ -125,7 +137,7 @@ let login, spinner, main, menu, dashboard, table, calendar, sections;
 const renderLogin = () => {
   login = new Login({
     callback: (val) => {
-      showData({
+      loginAccount({
         data: val,
         id: config.LOGIN_ID,
       });
@@ -142,13 +154,14 @@ const renderMain = () => {
     username: model.state.username,
     // OTHER VIEW TO BE LOADED AFTER LOADING THE MAIN VIEW
     callback: () => {
-      console.log("mainview callback");
       // CONTAINER CAN BE QUERIED AFTER ADDING THE MAIN
       sections = document.querySelectorAll("section");
       renderMenu();
       renderDashboard();
       renderTable();
       renderCalendar();
+      stepsform = new StepsForm();
+      trackerform = new TrackerForm();
     },
   });
 
@@ -159,11 +172,56 @@ const renderMain = () => {
 const renderMenu = () => {
   menu = new Menu({
     container: document.querySelector(".header"),
+
+    // FOCUS DASHBOARD
     callbackButton1: () => {
-      console.log("Update steps");
+      new Confirm({
+        title: `Dashboard| ${
+          model.state.username.charAt(0).toUpperCase() +
+          model.state.username.slice(1)
+        } | ${new Date().toDateString()}`,
+        message: dashboard.import(),
+        okText: "Close",
+        cancelButton: false,
+      });
     },
+
+    // FOCUS FORM
     callbackButton2: () => {
-      console.log("Update tracker");
+      new Confirm({
+        title: `Daily Tracker | ${
+          model.state.username.charAt(0).toUpperCase() +
+          model.state.username.slice(1)
+        } | ${new Date().toDateString()}`,
+        message: calendar.import(),
+        okText: "Close",
+        cancelButton: false,
+      });
+    },
+
+    callbackButton3: () => {
+      new Confirm({
+        title: `Update Tracker | ${
+          model.state.username.charAt(0).toUpperCase() +
+          model.state.username.slice(1)
+        } | ${new Date().toDateString()}`,
+        message: trackerform.import(),
+        okText: "Submit",
+        cancelText: "Cancel",
+      });
+    },
+
+    // STEPS
+    callbackButton4: () => {
+      new Confirm({
+        title: `Record Progress | ${
+          model.state.username.charAt(0).toUpperCase() +
+          model.state.username.slice(1)
+        } | ${new Date().toDateString()}`,
+        message: stepsform.import(),
+        okText: "Submit",
+        cancelText: "Cancel",
+      });
     },
     callbackLogout: () => {
       main.remove();
@@ -197,7 +255,7 @@ const renderTable = () => {
 
 // CALENDAR
 const renderCalendar = () => {
-  new Calendar({
+  calendar = new Calendar({
     container: sections[2],
     element: document.createElement("div"),
     data: model.state.calendar,
@@ -213,7 +271,6 @@ const init = () => {
   // localStorage.removeItem("state");
   if (model.isLoggedIn()) {
     renderMain();
-
     return;
   }
 
@@ -222,11 +279,10 @@ const init = () => {
 
 document.addEventListener("DOMContentLoaded", init);
 
-const showData = async (params) => {
+const loginAccount = async (params) => {
   try {
     spinner.render();
     await model.loadData(params);
-    console.log(model.state);
     login.remove();
     renderMain();
   } catch (error) {

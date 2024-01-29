@@ -87,4 +87,7 @@ export default class DashboardView {
     this.options.element.remove();
     this.options.callback();
   }
+  import() {
+    return this.options.element.innerHTML;
+  }
 }

@@ -31,6 +31,160 @@ export let state = {
   calendar: [],
 };
 
+export const loadData = async function (params) {
+  // state.username = params.data.username;
+  // state.registration = params.data.registration;
+  // state.now = mediumDateFormat.format(new Date());
+  // state.date = shortDateFormat.format(new Date());
+
+  resetObject(params);
+  let formData = new FormData();
+  formData.append("data", JSON.stringify(state));
+
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/${params.id}/exec`,
+      { method: "POST", body: formData }
+    );
+    const data = await response.json();
+
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+    state = data.data;
+
+    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
+    arrangeTableData();
+
+    // ARRANGE DATA IF THERE ARE STEPS RECORD
+    if (state.steps.length !== 0) {
+      // state.participants.steps = getParticipantsData(state.steps);
+      // PROCESS TABLE DATA
+      processUserData();
+    }
+
+    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
+    if (state.userData.steps.length) {
+      processDashboardData();
+    }
+
+    //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
+    //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
+    if (state.userData.tracker.length) {
+      state.calendar = getCalendarDates();
+    }
+
+    localStorage.setItem("state", JSON.stringify(state));
+  } catch (error) {
+    throw Error(error);
+  }
+};
+
+export const submitStepData = async function (params) {
+  let stepData = {
+    username: state.username,
+    registration: state.registration,
+    steps: params.data.steps,
+    minutes: params.data.minutes,
+    team: state.team,
+    now: mediumDateFormat.format(new Date()),
+    date: shortDateFormat.format(new Date()),
+  };
+
+  let formData = new FormData();
+  formData.append("data", JSON.stringify(stepData));
+
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/${params.id}/exec`,
+      { method: "POST", body: formData }
+    );
+    const data = await response.json();
+
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+
+    state.steps = data.data.steps;
+    arrangeTableData();
+
+    // ARRANGE DATA IF THERE ARE STEPS RECORD
+    if (state.steps.length !== 0) {
+      state.userData.steps = getUserData(state.steps);
+    }
+
+    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
+    if (state.userData.steps.length) {
+      processDashboardData();
+    }
+
+    localStorage.setItem("state", JSON.stringify(state));
+  } catch (error) {
+    throw Error(error);
+  }
+};
+
+export const submitTrackerData = async function (params) {
+  let stepData = {
+    username: state.username,
+    registration: state.registration,
+    steps: params.data.activity,
+    minutes: params.data.rating,
+    team: state.team,
+    now: mediumDateFormat.format(new Date()),
+    date: shortDateFormat.format(new Date()),
+  };
+
+  let formData = new FormData();
+  formData.append("data", JSON.stringify(stepData));
+
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/${params.id}/exec`,
+      { method: "POST", body: formData }
+    );
+    const data = await response.json();
+
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+
+    state.tracker = data.data.tracker;
+    state.userData.tracker = getUserData(state.tracker);
+    //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
+    //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
+    if (state.userData.tracker.length) {
+      state.calendar = getCalendarDates();
+    }
+
+    localStorage.setItem("state", JSON.stringify(state));
+  } catch (error) {
+    throw Error(error);
+  }
+};
+
+export const clearItem = () => {
+  localStorage.removeItem("state");
+};
+
+export const isLoggedIn = () => {
+  if (JSON.parse(localStorage.getItem("state"))) {
+    state = JSON.parse(localStorage.getItem("state"));
+    console.log(state);
+    return true;
+  }
+};
+
+const shortDateFormat = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "short",
+});
+
+const mediumDateFormat = new Intl.DateTimeFormat("en-US", {
+  timeStyle: "medium",
+  dateStyle: "short",
+});
+
+// CLEAR OBJECT
 const resetObject = (params) => {
   state = {
     username: params.data.username,
@@ -64,121 +218,6 @@ const resetObject = (params) => {
   };
 };
 
-export const loadData = async function (params) {
-  // state.username = params.data.username;
-  // state.registration = params.data.registration;
-  // state.now = mediumDateFormat.format(new Date());
-  // state.date = shortDateFormat.format(new Date());
-
-  resetObject(params);
-  let formData = new FormData();
-  formData.append("data", JSON.stringify(state));
-
-  try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData }
-    );
-    const data = await response.json();
-
-    if (data.result == "failed") {
-      throw Error(data.message);
-    }
-    state = data.data;
-
-    console.log(state);
-    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
-    arrangeTableData();
-
-    // ARRANGE DATA IF THERE ARE STEPS RECORD
-    if (state.steps.length !== 0) {
-      // state.participants.steps = getParticipantsData(state.steps);
-      // PROCESS TABLE DATA
-      processUserData();
-    }
-
-    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
-    if (state.userData.steps.length) {
-      processDashboardData();
-    }
-
-    //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
-    //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
-    if (state.userData.tracker.length) {
-      state.calendar = getCalendarDates();
-    }
-    localStorage.setItem("state", JSON.stringify(state));
-  } catch (error) {
-    throw Error(error);
-  }
-};
-
-export const submitStepData = async function (params) {
-  let stepData = {
-    username: state.username,
-    registration: state.registration,
-    steps: params.data.steps,
-    minutes: params.data.minutes,
-    team: state.team,
-    now: mediumDateFormat.format(new Date()),
-    date: shortDateFormat.format(new Date()),
-  };
-
-  let formData = new FormData();
-  formData.append("data", JSON.stringify(stepData));
-
-  try {
-    const response = await fetch(
-      `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData }
-    );
-    const data = await response.json();
-    state.steps = data.data.steps;
-
-    if (data.result == "failed") {
-      throw Error(data.message);
-    }
-    console.log(state);
-    arrangeTableData();
-
-    // ARRANGE DATA IF THERE ARE STEPS RECORD
-    if (state.steps.length !== 0) {
-      state.userData.steps = getUserData(state.steps);
-    }
-
-    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
-    if (state.userData.steps.length) {
-      processDashboardData();
-    }
-
-    localStorage.setItem("state", JSON.stringify(state));
-  } catch (error) {
-    throw Error(error);
-  }
-};
-
-export const clearItem = () => {
-  console.log("logout");
-  localStorage.removeItem("state");
-};
-
-export const isLoggedIn = () => {
-  if (JSON.parse(localStorage.getItem("state"))) {
-    state = JSON.parse(localStorage.getItem("state"));
-    console.log(state);
-    return true;
-  }
-};
-
-const shortDateFormat = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "short",
-});
-
-const mediumDateFormat = new Intl.DateTimeFormat("en-US", {
-  timeStyle: "medium",
-  dateStyle: "short",
-});
-
 // USER DATA FUNCTION
 const processUserData = () => {
   state.userData.steps = getUserData(state.steps);
@@ -192,7 +231,6 @@ const getUserData = (arr) => {
 // TABLE DATA FUNCTION
 const arrangeTableData = () => {
   // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
-  console.log("here");
   state.table.header = ["Rank", "Username", "Total Steps", "Team"];
   state.table.rows = getTableRows(state.steps);
 };
@@ -303,6 +341,4 @@ const getCalendarDates = () => {
       ),
     };
   });
-
-  console.log(test);
 };

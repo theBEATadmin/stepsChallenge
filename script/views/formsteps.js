@@ -9,7 +9,7 @@ export default class StepsForm {
           <strong class="the-beat">theBEAT</strong> Studio
         </h1>
         <h2 class="form-title">your best is yet challenge</h2>
-        <h2 class="form-subtitle">Week 1: 5 February 2024 | Monday</h2>
+       
       </div>
 
       <div class="form__content__inputs">

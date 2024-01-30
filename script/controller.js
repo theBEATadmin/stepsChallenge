@@ -110,7 +110,30 @@ const renderMenu = () => {
         okText: "Submit",
         cancelText: "Cancel",
         onok: (el) => {
-          console.log(el);
+          let activity = Array.from(el.querySelectorAll(".radio__input")).find(
+            (input) => input.checked
+          );
+
+          let rating = Array.from(
+            el.querySelectorAll(".rating__input")
+          ).findIndex((input) => input.checked);
+
+          if (activity == undefined && rating == -1) {
+            window.alert("Form is blank");
+            return;
+          }
+
+          submitTracker({
+            data: {
+              activity:
+                activity
+                  ?.closest(".radio")
+                  .querySelector(".radio__text")
+                  .innerText.trim() ?? "",
+              rating: rating == -1 ? "" : rating,
+            },
+            id: config.TRACKER_ID,
+          });
         },
       });
     },
@@ -181,6 +204,7 @@ const renderFilter = () => {
     table.filter(str);
   }, sections[1]);
 };
+
 // RENDER PAGINATION
 const renderPagination = () => {
   pagination = new Pagination(sections[1], (e) => {
@@ -196,6 +220,7 @@ const renderCalendar = () => {
     data: model.state.calendar,
   });
 };
+
 const init = () => {
   // SPINNER
   spinner = new Spinner({
@@ -234,6 +259,18 @@ const submitSteps = async (params) => {
 
     dashboard.update(model.state.dashboard);
     table.refresh(model.state.table);
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    spinner.remove();
+  }
+};
+
+const submitTracker = async (params) => {
+  try {
+    spinner.render();
+    await model.submitTrackerData(params);
+    calendar.refresh(model.state.calendar);
   } catch (error) {
     alert(error.message);
   } finally {

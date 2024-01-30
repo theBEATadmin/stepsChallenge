@@ -516,7 +516,8 @@ body * {
   text-align: center;
   top: -15px;
 }
-.day--checked::after {
+.day--checked::after,
+.day--starred::after {
   content: "\e876";
   color: rgba(25, 135, 84, 1);
 }
@@ -526,7 +527,7 @@ body * {
   color: rgba(255, 193, 7, 1);
 }
 .day--neither::before {
-  content: "\e814";
+  content: "\e876";
   font-family: "Material Icons";
   color: #dc3545;
 }
@@ -575,7 +576,7 @@ body * {
   color: rgba(25, 135, 84, 1);
 }
 .calendar__footer > span:nth-of-type(3)::before {
-  content: "\e14c";
+  content: "\e876";
   font-family: "Material Icons";
   color: #dc3545;
 }

@@ -25,11 +25,11 @@ export default class DashboardView {
   }
 
   _formatNumber(num) {
-    if (isNaN(num) || num == 0) return "-";
+    if (isNaN(num) || num == 0 || num == null) return "-";
     const numberFormat = new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 0,
     });
-
+    console.log(num);
     return numberFormat.format(parseInt(num));
   }
 

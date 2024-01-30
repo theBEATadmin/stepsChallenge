@@ -90,10 +90,6 @@ export default class Calendar {
 
         if (response) {
           switch (response.responseIndex) {
-            case -1:
-              mark = "day--neither";
-              break;
-
             case 0:
               mark = "day--checked";
               break;
@@ -102,8 +98,12 @@ export default class Calendar {
               mark = "day--checked";
               break;
 
+            case 2:
+              mark = "day--starred";
+              break;
+
             case 3:
-              mark = "day--starred day--checked";
+              mark = "day--neither";
               break;
 
             default:
@@ -259,6 +259,13 @@ export default class Calendar {
     });
   }
 
+  refresh(data) {
+    this.options.data = data;
+    this.options.dateToday = new Date();
+    this._getDays();
+    this._update();
+    this._renderMonth();
+  }
   import() {
     return this.element.innerHTML;
   }

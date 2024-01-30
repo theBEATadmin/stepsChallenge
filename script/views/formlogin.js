@@ -35,9 +35,9 @@ export default class LoginView {
         required
         />
         <input
-        type="password"
-        name="password"
-        placeholder="Password*"
+        type="text"
+        name="registration"
+        placeholder="Registration No.*"
         class="form__input"
         autocomplete="off"
         required

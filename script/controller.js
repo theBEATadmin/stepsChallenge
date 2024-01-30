@@ -3,135 +3,33 @@
 import * as model from "./model.js";
 import * as config from "./config.js";
 import Spinner from "./views/spinner.js";
-import Login from "./views/loginview.js";
+import Login from "./views/formlogin.js";
 import Menu from "./views/menuview.js";
 import MainView from "./views/mainview.js";
 import Dashboard from "./views/dashboardview.js";
+
+// RANKNG PANEL
+import Pagination from "./views/paginationview.js";
+import Filter from "./views/filterview.js";
 import Table from "./views/tableview.js";
+
 import Calendar from "./views/calendarview.js";
 import Confirm from "./views/confirmview.js";
-import StepsForm from "./views/stepsform.js";
-import TrackerForm from "./views/trackerform.js";
+import StepsForm from "./views/formsteps.js";
+import TrackerForm from "./views/formtracker.js";
 
 let login,
   spinner,
   main,
   menu,
   dashboard,
+  filter,
+  pagination,
   table,
   calendar,
   stepsform,
   trackerform;
 let sections;
-// https://script.google.com/macros/s/AKfycbzwSUvHiomI_m_FelXVgKHRSaq7iAw1QpDZq3jXzT3Fh9eXY7bW6OEFXiO1b6AUG5LO5w/exec
-
-// const initLogin = () => {
-//   document.querySelector(".button-login").addEventListener("click", (e) => {
-//     const spinner = new Spinner({
-//       callback: () => {
-//         e.target.closest(".form").remove();
-//         document.body.appendChild(
-//           document.querySelector("#main").content.cloneNode(true)
-//         );
-//         // init();
-//       },
-//       timeout: 2500,
-//     });
-//   });
-// };
-
-/* const init = () => {
-  const mabButtons = document.querySelectorAll(".mab__button--secondary");
-  const floatingButtons = document.querySelectorAll(".floating-button");
-
-  {
-    // ENABALE ALL MENU BUTTONS
-    document.querySelectorAll(".mab").forEach((multiAction) => {
-      const menuButton = multiAction.querySelector(".mab__button--menu");
-      const list = multiAction.querySelector(".mab__list");
-
-      menuButton.addEventListener("click", () => {
-        list.classList.toggle("mab__list--visible");
-      });
-    });
-
-    // HIDE ALL LIST WHEN CLICKING ELSEWHERE ON THE PAGE
-    document.addEventListener("click", (e) => {
-      const keepOpen =
-        e.target.matches(".mab__list") ||
-        e.target.matches(".mab__button--menu") ||
-        e.target.closest(".mab__icon");
-
-      if (keepOpen) return;
-
-      document.querySelectorAll(".mab__list").forEach((list) => {
-        list.classList.remove("mab__list--visible");
-      });
-    });
-  }
-  // RENDER STEPS FORM
-  mabButtons[0].addEventListener("click", () => {
-    Confirm.open({
-      title: "Record Progress",
-      message: document.querySelector("#progress").innerHTML,
-      onok: () => {},
-      okText: "Submit",
-      cancelText: "Cancel",
-    });
-  });
-
-  // RENDER TRACKER FORM
-  mabButtons[1].addEventListener("click", () => {
-    Confirm.open({
-      title: "Update Tracker",
-      message: document.querySelector("#tracker").innerHTML,
-      onok: () => {},
-      okText: "Submit",
-      cancelText: "Cancel",
-    });
-  });
-
-  // LOGOUT
-  mabButtons[2].addEventListener("click", () => {
-    document
-      .querySelectorAll(".header, .main, .footer")
-      .forEach((el) => el.remove());
-
-    document.body.appendChild(templates[0].content.cloneNode(true));
-    initLogin();
-  });
-  // RENDER STEPS RESULT
-  floatingButtons[0].addEventListener("click", () => {
-    const content = document.querySelectorAll(".section")[0].cloneNode(true);
-
-    // REMOVE THE TITLE & BUTTON
-    content.querySelector(".section__title").remove();
-    content.querySelector(".floating-button").remove();
-
-    Confirm.open({
-      title: "Steps Progress| Ranessa | 24 Jan 2024",
-      message: content.innerHTML,
-      okText: "Close",
-      cancelButtonVisible: false,
-    });
-  });
-
-  // RENDER TRACKER RESULT
-  floatingButtons[1].addEventListener("click", () => {
-    const content = document.querySelectorAll(".section")[2].cloneNode(true);
-
-    // REMOVE THE TITLE
-    content.querySelector(".section__title").remove();
-    content.querySelector(".floating-button").remove();
-
-    Confirm.open({
-      title: "Tracker | Ranessa | 24 Jan 2024",
-      message: content.innerHTML,
-      okText: "Close",
-      cancelButtonVisible: false,
-    });
-  });
-}; */
 
 // LOGIN
 const renderLogin = () => {
@@ -158,7 +56,10 @@ const renderMain = () => {
       sections = document.querySelectorAll("section");
       renderMenu();
       renderDashboard();
+      //RENDER PAGINATION MUST BE INOVOKE PRIOR TO TABLE
+      renderPagination();
       renderTable();
+      renderFilter();
       renderCalendar();
       stepsform = new StepsForm();
       trackerform = new TrackerForm();
@@ -208,6 +109,9 @@ const renderMenu = () => {
         message: trackerform.import(),
         okText: "Submit",
         cancelText: "Cancel",
+        onok: (el) => {
+          console.log(el);
+        },
       });
     },
 
@@ -221,8 +125,21 @@ const renderMenu = () => {
         message: stepsform.import(),
         okText: "Submit",
         cancelText: "Cancel",
+        onok: (el) => {
+          let data = {};
+
+          el.querySelectorAll("input").forEach(
+            (input) => (data[input.name] = input.value)
+          );
+
+          submitSteps({
+            data: data,
+            id: config.STEPS_ID,
+          });
+        },
       });
     },
+
     callbackLogout: () => {
       main.remove();
       renderLogin();
@@ -248,9 +165,26 @@ const renderTable = () => {
   table = new Table({
     container: sections[1],
     username: model.state.username,
+    team: model.state.team,
     data: model.state.table,
+    callback: (params) => {
+      console.log("RETURNED");
+      pagination.render(params);
+    },
   });
-  table.addRow();
+};
+
+// RENDER FILTER
+const renderFilter = () => {
+  filter = new Filter((str) => {
+    table.filter(str);
+  }, sections[1]);
+};
+// RENDER PAGINATION
+const renderPagination = () => {
+  pagination = new Pagination(sections[1], (e) => {
+    table.page(e.target.value);
+  });
 };
 
 // CALENDAR
@@ -285,6 +219,19 @@ const loginAccount = async (params) => {
     await model.loadData(params);
     login.remove();
     renderMain();
+  } catch (error) {
+    alert(error.message);
+  } finally {
+    spinner.remove();
+  }
+};
+
+const submitSteps = async (params) => {
+  try {
+    spinner.render();
+    console.log(params);
+    await model.submitStepData(params);
+    location.reload();
   } catch (error) {
     alert(error.message);
   } finally {

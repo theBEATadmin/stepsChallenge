@@ -49,6 +49,7 @@ export default class Confirm {
     const btnCancel = template.content.querySelector(
       ".confirm__button--cancel"
     );
+    const confirmContent = template.content.querySelector(".confirm__content");
 
     confirmEl.addEventListener("click", (e) => {
       if (e.target === confirmEl) {
@@ -58,7 +59,7 @@ export default class Confirm {
     });
 
     btnOk.addEventListener("click", () => {
-      this.options.onok();
+      this.options.onok(confirmContent.cloneNode(true));
       this._close(confirmEl);
     });
 

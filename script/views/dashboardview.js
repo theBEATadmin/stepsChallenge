@@ -18,10 +18,17 @@ export default class DashboardView {
       },
       options
     );
+
+    // CONVERT 0 TO -
+    // Object.keys(this.options.data).forEach(
+    //   (key) =>
+    //     (this.options.data[key] =
+    //       this.options.data[key] == 0 ? "-" : this.options.data[key])
+    // );
   }
 
   _formatNumber(num) {
-    if (isNaN(num)) return "-";
+    if (isNaN(num) || num == 0) return "-";
     const numberFormat = new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 0,
     });
@@ -87,6 +94,7 @@ export default class DashboardView {
     this.options.element.remove();
     this.options.callback();
   }
+  update() {}
   import() {
     return this.options.element.innerHTML;
   }

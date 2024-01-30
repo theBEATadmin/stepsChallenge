@@ -14,16 +14,18 @@ export default class StepsForm {
 
       <div class="form__content__inputs">
         <input
-          type="text"
+          type="number"
           name="steps"
           placeholder="Total steps*"
           class="form__input"
+          autocomplete="off"
           required
         />
         <input
-          type="test"
+          type="number"
           name="minutes"
           placeholder="Active minutes*"
+          autocomplete="off"
           class="form__input"
           required
         />

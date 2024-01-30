@@ -1,1 +1,2 @@
-export const LOGIN_ID = `AKfycbwiJ1DNQ_vCwzYCXISqcCNYHExg4Sjnc5smS1n6rGx3O7oARiuxRbmJUPrvfNdlog4zPg`;
+export const LOGIN_ID = `AKfycbwUtPOQt1yjbH0hjKEICyWCoLQXmIsyAAZ6gxYBGMUCe5XKhCOQBFQ61xqgPg7s8txabQ`;
+export const STEPS_ID = `AKfycbxf65c3mCPm5Z2kMqvfZnFBFRw3WOCTB9OT89PEgxCCPMI-lPcCfvn3-5eJxdBBx_W_`;

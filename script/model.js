@@ -5,7 +5,7 @@ export let state = {
   password: "",
   date: "",
   now: "",
-  coach: "",
+  team: "",
   steps: [],
   tracker: [],
   userData: {
@@ -33,7 +33,7 @@ export let state = {
 
 export const loadData = async function (params) {
   state.username = params.data.username;
-  state.password = params.data.password;
+  state.registration = params.data.registration;
   state.now = mediumDateFormat.format(new Date());
   state.date = shortDateFormat.format(new Date());
 
@@ -50,40 +50,73 @@ export const loadData = async function (params) {
     if (data.result == "failed") {
       throw Error(data.message);
     }
-    state = {};
+
     state = data.data;
+
+    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
+    arrangeTableData();
 
     // ARRANGE DATA IF THERE ARE STEPS RECORD
     if (state.steps.length !== 0) {
-      state.userData.steps = getUserData(state.steps);
-      state.userData.tracker = getUserData(state.tracker);
       // state.participants.steps = getParticipantsData(state.steps);
-
       // PROCESS TABLE DATA
-      // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
-      state.table.header = ["Rank", "Username", "Total Steps", "Coach"];
-      state.table.rows = getTableRows(state.steps);
+      processUserData();
     }
 
     //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
     if (state.userData.steps.length) {
-      state.dashboard.count = state.participants.names.length;
-      state.dashboard.steps = getStepsToday();
-      state.dashboard.totSteps = computeTotSteps("steps");
-      state.dashboard.avgSteps = computeAvgSteps("totSteps");
-      state.dashboard.totMinutes = computeTotSteps("minutes");
-      state.dashboard.avgMinutes = computeAvgSteps("totMinutes");
-      state.dashboard.rank = state.table.rows.find(
-        (row) => row[1] == state.username
-      )[0];
+      processDashboardData();
     }
 
     //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
     //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
     if (state.userData.tracker.length) {
       state.calendar = getCalendarDates();
-      console.log("calendar");
     }
+    localStorage.setItem("state", JSON.stringify(state));
+  } catch (error) {
+    throw Error(error);
+  }
+};
+
+export const submitStepData = async function (params) {
+  let stepData = {
+    username: state.username,
+    registration: state.registration,
+    steps: params.data.steps,
+    minutes: params.data.minutes,
+    team: state.team,
+    now: mediumDateFormat.format(new Date()),
+    date: shortDateFormat.format(new Date()),
+  };
+
+  let formData = new FormData();
+  formData.append("data", JSON.stringify(stepData));
+
+  try {
+    const response = await fetch(
+      `https://script.google.com/macros/s/${params.id}/exec`,
+      { method: "POST", body: formData }
+    );
+    const data = await response.json();
+    state.steps = data.data.steps;
+
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+    console.log(state);
+    arrangeTableData();
+
+    // ARRANGE DATA IF THERE ARE STEPS RECORD
+    if (state.steps.length !== 0) {
+      state.userData.steps = getUserData(state.steps);
+    }
+
+    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
+    if (state.userData.steps.length) {
+      processDashboardData();
+    }
+
     localStorage.setItem("state", JSON.stringify(state));
   } catch (error) {
     throw Error(error);
@@ -98,8 +131,7 @@ export const clearItem = () => {
 export const isLoggedIn = () => {
   if (JSON.parse(localStorage.getItem("state"))) {
     state = JSON.parse(localStorage.getItem("state"));
-    state.table.rows = getTableRows(state.steps);
-    console.log(state.userData.tracker);
+    console.log(state);
     return true;
   }
 };
@@ -113,20 +145,33 @@ const mediumDateFormat = new Intl.DateTimeFormat("en-US", {
   dateStyle: "short",
 });
 
+// USER DATA FUNCTION
+const processUserData = () => {
+  state.userData.steps = getUserData(state.steps);
+  state.userData.tracker = getUserData(state.tracker);
+};
+
 const getUserData = (arr) => {
   return arr.filter((datum) => datum.username == state.username);
 };
 
 // TABLE DATA FUNCTION
+const arrangeTableData = () => {
+  // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
+  console.log("here");
+  state.table.header = ["Rank", "Username", "Total Steps", "Team"];
+  state.table.rows = getTableRows(state.steps);
+};
+
 const getTableRows = (data) => {
-  // GET THE USERNAME, COACH AND SUM OF THE TOTAL STEPS  OF EACH PARTICIPANT
+  // GET THE USERNAME, team AND SUM OF THE TOTAL STEPS  OF EACH PARTICIPANT
   let tableRow = state.participants.names.map((datumA) => {
     // GET ALL RECORDS OF USER
     let records = data.filter((datumB) => datumA.name === datumB.username);
     return [
       datumA.name,
       records?.reduce((tot, acc) => (tot += acc.steps), 0),
-      datumA.coach,
+      datumA.team,
     ];
   });
 
@@ -161,6 +206,18 @@ const getTableRows = (data) => {
 };
 
 // DASHBOARD DATA FUNCTIONS
+const processDashboardData = () => {
+  state.dashboard.count = state.participants.names.length;
+  state.dashboard.steps = getStepsToday();
+  state.dashboard.totSteps = computeTotSteps("steps");
+  state.dashboard.avgSteps = computeAvgSteps("totSteps");
+  state.dashboard.totMinutes = computeTotSteps("minutes");
+  state.dashboard.avgMinutes = computeAvgSteps("totMinutes");
+  state.dashboard.rank = state.table.rows.find(
+    (row) => row[1] == state.username
+  )[0];
+};
+
 const getStepsToday = () => {
   const result = state.userData.steps.find((datum) => {
     if (shortDateFormat.format(new Date(datum.date)) == state.date)

@@ -6,20 +6,32 @@ export default class Table {
         container: document.body,
         element: document.createElement("table"),
         username: "",
+        team: "",
         data: {
           header: [],
           rows: [],
         },
+        callback: () => {},
       },
       options
     );
 
     this.options.element.classList.add("table");
+
+    // SET VAR FOR FILTER AND PAGINATION
+    this.filtered = false;
+    this.pageNumber = 1;
+    this.maxRowsVisible = 10;
+    this.filteredRows = this.options.data.rows;
+    this.renderRows = [];
     this._addHeader();
-    console.log(this.options.container);
+    this._addRows();
     this.options.container.insertAdjacentElement(
-      "beforeend",
+      "afterbegin",
       this.options.element
+    );
+    this.options.callback(
+      Math.ceil(this.filteredRows.length / this.maxRowsVisible)
     );
   }
 
@@ -34,26 +46,52 @@ export default class Table {
         .join("")}
     </tr>
   </thead>
-  <tbody>
-  </tbody>
+  <tbody></tbody>
 `;
   }
 
-  addRow(data = this.options.body) {
-    this.options.element.querySelector("tbody").insertAdjacentHTML(
-      "afterbegin",
-      this.options.data.rows
-        .map((row) => {
-          return `<tr class="${
-            row[1] == this.options.username ? "active-row" : ""
-          }">
+  _addRows() {
+    // LOGIC: MULTIPLY THE (pageNumber - 1) BY maxRowsVisible
+    // FILTER PAGE TO DISPLAY
+    const startIndex = (this.pageNumber - 1) * this.maxRowsVisible;
+    const endIndex = startIndex + this.maxRowsVisible;
+    const rows = this.filteredRows.slice(startIndex, endIndex);
+
+    console.log(startIndex, endIndex);
+    console.log(rows);
+
+    this.options.element.querySelector("tbody").innerHTML = rows
+      .map((row) => {
+        return `<tr class="${
+          row[1] == this.options.username ? "active-row" : ""
+        }">
     ${row
       .map((datum) => {
         return `<td>${datum}</td>`;
       })
       .join("")}</tr>`;
+      })
+      .join("");
+  }
+
+  page(num) {
+    console.log(num);
+    this.pageNumber = num;
+    this._addRows();
+  }
+
+  filter(str) {
+    this.filtered = str === "true";
+    this.pageNumber = 1;
+    this.filteredRows = this.filtered
+      ? this.options.data.rows.filter((row) => {
+          return row[3] === this.options.team;
         })
-        .join("")
+      : this.options.data.rows;
+
+    this._addRows();
+    this.options.callback(
+      Math.ceil(this.filteredRows.length / this.maxRowsVisible)
     );
   }
 }

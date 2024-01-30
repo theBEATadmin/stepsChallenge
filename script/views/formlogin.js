@@ -21,7 +21,7 @@ export default class LoginView {
         <h1 class="form-subtitle">
         <strong class="the-beat">theBEAT</strong> Studio
         </h1>
-        <h2 class="form-title">your best is yet challenge</h2>
+        <h2 class="form-title">your best yet challenge</h2>
         <h2 class="form-subtitle">Record Your Progress Today</h2>
     </div>
 
@@ -47,8 +47,8 @@ export default class LoginView {
 
     <div class="form__content__links">
         <p class="form__link">
-        Don't know your username or membership number? Get intouch with
-        your coach or your team leader
+        Don't know your username or membership number? Please check your digital membership card or get intouch with
+        your team coach.
         </p>
     </div>
 </div>`;

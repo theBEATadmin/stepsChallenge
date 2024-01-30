@@ -4,40 +4,49 @@ export default class Table {
       {},
       {
         container: document.body,
-        element: document.createElement("table"),
+        // element: document.createElement("table"),
         username: "",
         team: "",
         data: {
           header: [],
           rows: [],
         },
-        callback: () => {},
+        callbackPagination: () => {},
+        callbackFilter: () => {},
       },
       options
     );
 
-    this.options.element.classList.add("table");
+    this.element;
 
-    // SET VAR FOR FILTER AND PAGINATION
-    this.filtered = false;
-    this.pageNumber = 1;
-    this.maxRowsVisible = 10;
-    this.filteredRows = this.options.data.rows;
-    this.renderRows = [];
-    this._addHeader();
-    this._addRows();
-    this.options.container.insertAdjacentElement(
-      "afterbegin",
-      this.options.element
-    );
-    this.options.callback(
-      Math.ceil(this.filteredRows.length / this.maxRowsVisible)
+    // SET INTIAL VALUES
+    this._reset();
+
+    this.element = document.createElement("table");
+    this.element.classList.add("table");
+    this.element.innerHTML = this._generateMarkup();
+    this.options.container.insertAdjacentElement("afterbegin", this.element);
+    this.options.callbackPagination(
+      Math.ceil(this.filteredRows.length / this.maxRows)
     );
   }
 
-  _addHeader() {
-    this.options.element.innerHTML = `
-  <thead>
+  _reset() {
+    this.filtered = false;
+    this.pageNumber = 1;
+    this.maxRows = 10;
+    this.maxColumns = 4;
+    this.filteredRows = this.options.data.rows;
+    this.renderRows = [];
+  }
+  // THIS FUNCTIONS SUPERCEDED THE _addHeader AND _addRows
+  // THIS WILL HAVE A  4 X 10 TABLE
+  _generateMarkup() {
+    const startIndex = (this.pageNumber - 1) * this.maxRows;
+    const endIndex = startIndex + this.maxRows;
+    const rows = this.filteredRows.slice(startIndex, endIndex);
+
+    return `<thead>
     <tr>
       ${this.options.data.header
         .map((datum) => {
@@ -46,38 +55,33 @@ export default class Table {
         .join("")}
     </tr>
   </thead>
-  <tbody></tbody>
-`;
+  <tbody>
+  ${Array.from({ length: this.maxRows }, (_, indexRow) => {
+    return `<tr ${
+      rows?.[indexRow]?.[1] == this.options.username ? "class=active-row" : ""
+    }>${Array.from({ length: this.maxColumns }, (_, indexData) => {
+      return `<td>${rows?.[indexRow]?.[indexData] ?? "&nbsp;"}</td>`;
+    }).join("")}</tr>`;
+  }).join("")}
+  </tbody>`;
   }
 
-  _addRows() {
-    // LOGIC: MULTIPLY THE (pageNumber - 1) BY maxRowsVisible
-    // FILTER PAGE TO DISPLAY
-    const startIndex = (this.pageNumber - 1) * this.maxRowsVisible;
-    const endIndex = startIndex + this.maxRowsVisible;
-    const rows = this.filteredRows.slice(startIndex, endIndex);
+  _update() {
+    const newMarkup = `<table>${this._generateMarkup()}</table>`;
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(newDOM.querySelectorAll("tbody tr"));
+    const currentElements = Array.from(
+      this.element.querySelectorAll("tbody tr")
+    );
 
-    console.log(startIndex, endIndex);
-    console.log(rows);
+    newElements.forEach((newElement, index) => {
+      const currentElement = currentElements[index];
 
-    this.options.element.querySelector("tbody").innerHTML = rows
-      .map((row) => {
-        return `<tr class="${
-          row[1] == this.options.username ? "active-row" : ""
-        }">
-    ${row
-      .map((datum) => {
-        return `<td>${datum}</td>`;
-      })
-      .join("")}</tr>`;
-      })
-      .join("");
-  }
-
-  page(num) {
-    console.log(num);
-    this.pageNumber = num;
-    this._addRows();
+      if (!newElement.isEqualNode(currentElement)) {
+        currentElement.innerHTML = newElement.innerHTML;
+        currentElement.className = newElement.className;
+      }
+    });
   }
 
   filter(str) {
@@ -89,9 +93,24 @@ export default class Table {
         })
       : this.options.data.rows;
 
-    this._addRows();
-    this.options.callback(
-      Math.ceil(this.filteredRows.length / this.maxRowsVisible)
+    this._update();
+    this.options.callbackPagination(
+      Math.ceil(this.filteredRows.length / this.maxRows)
+    );
+  }
+
+  page(num) {
+    this.pageNumber = num;
+    this._update();
+  }
+
+  refresh(data) {
+    this.options.data = data;
+    this._reset();
+    this._update();
+    this.options.callbackFilter(true);
+    this.options.callbackPagination(
+      Math.ceil(this.filteredRows.length / this.maxRows)
     );
   }
 }

@@ -51,7 +51,7 @@ export default class TrackerForm {
             />
             <div class="radio__radio"></div>
             <span class="radio__text">
-              completed my steps and joined or workout
+            completed my steps and joined a class or a workout
             </span>
           </label>
         </div>
@@ -65,7 +65,7 @@ export default class TrackerForm {
               class="radio__input"
             />
             <div class="radio__radio"></div>
-            <span class="radio__text"> won't able to do either </span>
+            <span class="radio__text">wasn't able to do either </span>
           </label>
         </div>
       </div>

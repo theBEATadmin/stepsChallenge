@@ -23,6 +23,7 @@ export default class PaginationButton {
 
   render(totalPages, maxPagesVisible = 10, currentPage = 1) {
     this._remove();
+
     let pages = pageNumbers(totalPages, maxPagesVisible, currentPage);
     let currentPageBtn = null;
     const buttons = new Map();

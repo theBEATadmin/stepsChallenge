@@ -21,16 +21,17 @@ export default class Calendar {
       options
     );
 
-    this.options.element.className = "calendar";
+    this.element = document.createElement("div");
+    this.element.className = "calendar";
     this._getDays();
     this._appendBody();
     this._addListener();
     this._renderMonth();
-    this.options.container.append(this.options.element);
+    this.options.container.append(this.element);
   }
 
   _appendBody() {
-    this.options.element.innerHTML = `<div class="calendar">
+    this.element.innerHTML = `<div class="calendar">
     <div class="calendar__window">
       <div class="calendar__header">
         <div class="month">
@@ -70,7 +71,6 @@ export default class Calendar {
   }
 
   _appendDays() {
-    console.log(this.options.data);
     return this.options.days
       .map((day, dayIndex) => {
         const newDate = new Date(day);
@@ -103,7 +103,7 @@ export default class Calendar {
               break;
 
             case 3:
-              mark = "day--starred";
+              mark = "day--starred day--checked";
               break;
 
             default:
@@ -120,23 +120,28 @@ export default class Calendar {
   }
 
   _renderMonth() {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
+    const dateTimeFormat = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+    });
+    // const months = [
+    //   "January",
+    //   "February",
+    //   "March",
+    //   "April",
+    //   "May",
+    //   "June",
+    //   "July",
+    //   "August",
+    //   "September",
+    //   "October",
+    //   "November",
+    //   "December",
+    // ];
 
-    this.options.element.querySelector(".month h1").innerHTML =
-      months[this.options.dateToday.getMonth()];
+    this.element.querySelector(".month h1").innerHTML = dateTimeFormat.format(
+      this.options.dateToday
+    );
   }
 
   _getDays() {
@@ -191,7 +196,7 @@ export default class Calendar {
   }
 
   _addListener() {
-    this.options.element.addEventListener("click", (e) => {
+    this.element.addEventListener("click", (e) => {
       if (e.target.closest(".button-calendar")) {
         this.options.callBack();
         return;
@@ -205,19 +210,29 @@ export default class Calendar {
 
         if (e.target.closest(".month__next")) {
           this.options.dateToday = new Date(
-            newDate.setMonth(newDate.getMonth() + 1)
+            this.options.dateToday.getFullYear(),
+            this.options.dateToday.getMonth() + 1,
+            1
           );
+          // this.options.dateToday = new Date(
+          //   newDate.setMonth(newDate.getMonth() + 1)
+          // );
         }
 
         if (e.target.closest(".month__prev")) {
           this.options.dateToday = new Date(
-            newDate.setMonth(newDate.getMonth() - 1)
+            this.options.dateToday.getFullYear(),
+            this.options.dateToday.getMonth() - 1,
+            1
           );
+          // this.options.dateToday = new Date(
+          //   newDate.setMonth(newDate.getMonth() - 1)
+          // );
         }
 
         this._getDays();
-        this.options.element.querySelector(".days").innerHTML =
-          this._appendDays();
+        // this.element.querySelector(".days").innerHTML = this._appendDays();
+        this._update();
         this._renderMonth();
 
         return;
@@ -225,7 +240,26 @@ export default class Calendar {
     });
   }
 
+  _update() {
+    const newMarkup = this._appendDays();
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(newDOM.querySelectorAll(".day"));
+    const currentElements = Array.from(this.element.querySelectorAll(".day"));
+
+    newElements.forEach((newElement, index) => {
+      const currentElement = currentElements[index];
+
+      if (!newElement.isEqualNode(currentElement)) {
+        currentElement.innerHTML = newElement.innerHTML;
+        // currentElement.className = newElement.className;
+        Array.from(newElement.attributes).forEach((attr) =>
+          currentElement.setAttribute(attr.name, attr.value)
+        );
+      }
+    });
+  }
+
   import() {
-    return this.options.element.innerHTML;
+    return this.element.innerHTML;
   }
 }

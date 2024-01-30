@@ -4,7 +4,6 @@ export default class DashboardView {
       {},
       {
         container: document.body,
-        element: document.createElement("div"),
         userName: "",
         data: {
           steps: 0,
@@ -19,12 +18,10 @@ export default class DashboardView {
       options
     );
 
-    // CONVERT 0 TO -
-    // Object.keys(this.options.data).forEach(
-    //   (key) =>
-    //     (this.options.data[key] =
-    //       this.options.data[key] == 0 ? "-" : this.options.data[key])
-    // );
+    this.element = document.createElement("div");
+    this.element.className = "dashboard";
+    this.element.innerHTML = this._generateMarkup();
+    this.options.container.insertAdjacentElement("afterbegin", this.element);
   }
 
   _formatNumber(num) {
@@ -36,9 +33,8 @@ export default class DashboardView {
     return numberFormat.format(parseInt(num));
   }
 
-  render() {
-    this.options.element.className = "dashboard";
-    this.options.element.innerHTML = `<div class="dashboard-contents">
+  _generateMarkup() {
+    return `<div class="dashboard-contents">
               <span class="dashboard-contents__number">${this._formatNumber(
                 this.options.data.steps
               )}</span>
@@ -53,13 +49,13 @@ export default class DashboardView {
             <div class="dashboard-contents">
               <div class="dashboard-content">
                 <div class="dashboard-subcontent">
-                  <span class="dashboard-content__text">Steps</span>
+                  <span class="dashboard-content__text">Total Steps</span>
                   <span class="dashboard-content__number">${this._formatNumber(
                     this.options.data.totSteps
                   )}</span>
                 </div>
                 <div class="dashboard-subcontent">
-                  <span class="dashboard-content__text">Active Minutes</span>
+                  <span class="dashboard-content__text">Totak Active Minutes</span>
                   <span class="dashboard-content__number">${this._formatNumber(
                     this.options.data.totMinutes
                   )}</span>
@@ -76,7 +72,7 @@ export default class DashboardView {
                 </div>
                 <div class="dashboard-subcontent">
                   <span class="dashboard-content__text"
-                    >Daily Active Minutes</span
+                    >Active Minutes Daily Average</span
                   >
                   <span class="dashboard-content__number">${this._formatNumber(
                     this.options.data.avgMinutes
@@ -84,18 +80,35 @@ export default class DashboardView {
                 </div>
               </div>
             </div>`;
+  }
 
-    this.options.container.insertAdjacentElement(
-      "afterbegin",
-      this.options.element
+  update(data) {
+    this.options.data = data;
+
+    const newMarkup = this._generateMarkup();
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(
+      newDOM.querySelectorAll(
+        ".dashboard-contents__number,dashboard-content__number"
+      )
     );
+
+    const currentElements = Array.from(
+      this.element.querySelectorAll(
+        ".dashboard-contents__number,dashboard-content__number"
+      )
+    );
+
+    newElements.forEach((newElement, index) => {
+      const currentElement = currentElements[index];
+
+      if (!newElement.isEqualNode(currentElement)) {
+        currentElement.textContent = newElement.textContent;
+      }
+    });
   }
-  remove() {
-    this.options.element.remove();
-    this.options.callback();
-  }
-  update() {}
+
   import() {
-    return this.options.element.innerHTML;
+    return this.element.innerHTML;
   }
 }

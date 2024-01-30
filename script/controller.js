@@ -157,7 +157,6 @@ const renderDashboard = () => {
     username: model.state.username,
     data: model.state.dashboard,
   });
-  dashboard.render();
 };
 
 // TABLE
@@ -167,9 +166,11 @@ const renderTable = () => {
     username: model.state.username,
     team: model.state.team,
     data: model.state.table,
-    callback: (params) => {
-      console.log("RETURNED");
+    callbackPagination: (params) => {
       pagination.render(params);
+    },
+    callbackFilter: (boolean) => {
+      filter.reset(boolean);
     },
   });
 };
@@ -229,9 +230,10 @@ const loginAccount = async (params) => {
 const submitSteps = async (params) => {
   try {
     spinner.render();
-    console.log(params);
     await model.submitStepData(params);
-    location.reload();
+
+    dashboard.update(model.state.dashboard);
+    table.refresh(model.state.table);
   } catch (error) {
     alert(error.message);
   } finally {

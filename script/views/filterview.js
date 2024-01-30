@@ -32,4 +32,8 @@ export default class ButtonGroup {
 
     container.insertAdjacentElement("afterbegin", this.element);
   }
+
+  reset(boolean) {
+    this.element.querySelector("input").checked = boolean;
+  }
 }

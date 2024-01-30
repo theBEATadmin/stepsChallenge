@@ -31,12 +31,46 @@ export let state = {
   calendar: [],
 };
 
-export const loadData = async function (params) {
-  state.username = params.data.username;
-  state.registration = params.data.registration;
-  state.now = mediumDateFormat.format(new Date());
-  state.date = shortDateFormat.format(new Date());
+const resetObject = (params) => {
+  state = {
+    username: params.data.username,
+    registration: params.data.registration,
+    date: shortDateFormat.format(new Date()),
+    now: mediumDateFormat.format(new Date()),
+    team: "",
+    steps: [],
+    tracker: [],
+    userData: {
+      steps: [],
+      tracker: [],
+    },
+    participants: {
+      steps: [],
+    },
+    dashboard: {
+      steps: 0,
+      avgSteps: 0,
+      totSteps: 0,
+      avgMinutes: 0,
+      totMinutes: 0,
+      rank: 0,
+      count: 0,
+    },
+    table: {
+      header: [],
+      rows: [],
+    },
+    calendar: [],
+  };
+};
 
+export const loadData = async function (params) {
+  // state.username = params.data.username;
+  // state.registration = params.data.registration;
+  // state.now = mediumDateFormat.format(new Date());
+  // state.date = shortDateFormat.format(new Date());
+
+  resetObject(params);
   let formData = new FormData();
   formData.append("data", JSON.stringify(state));
 
@@ -50,9 +84,9 @@ export const loadData = async function (params) {
     if (data.result == "failed") {
       throw Error(data.message);
     }
-
     state = data.data;
 
+    console.log(state);
     // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
@@ -255,8 +289,8 @@ const getCalendarDates = () => {
   const responses = [
     "completed my steps",
     "joined a class or a workout",
-    "completed my steps and joined or workout",
-    "won't able to do either",
+    "completed my steps and joined a class or a workout",
+    "wasn't able to do either",
   ];
 
   return state.userData.tracker.map((datum) => {

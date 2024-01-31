@@ -63,7 +63,7 @@ export default class Calendar {
             completed my steps <strong>OR</strong> joined a class or a workout
         </span>
         <span class="footer3">
-            won't able to do either
+           it was a tough day, wasn't able to do either
         </span>
       </div>
     </div>

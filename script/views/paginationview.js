@@ -1,171 +1,130 @@
-"use strict";
+export default class PaginationButtons {
+  constructor(options) {
+    this.options = Object.assign(
+      {},
+      {
+        total: 50,
+        visible: 5,
+        current: 1,
+        container: document.body,
+        callback: () => {},
+      },
+      options
+    );
+    this.pages;
+    this.currentPageButton = null;
+    this.element = document.createElement("div");
+    this.element.className = "pagination-buttons";
 
-const pageNumbers = (total, max, current) => {
-  const half = Math.floor(max / 2);
-  let to = max;
+    this._generatePageNumbers();
+    this.element.innerHTML = this._generateMarkup();
 
-  if (current + half >= total) {
-    to = total;
-  } else if (current > half) {
-    to = current + half;
+    this.element.addEventListener("click", (e) => {
+      e.preventDefault();
+      const el = e.target.closest(".page-btn");
+
+      if (!el) return;
+      this._handleClick(el);
+    });
+
+    this.options.container.appendChild(this.element);
   }
 
-  let from = Math.max(to - max, 0);
+  _generatePageNumbers() {
+    let total = this.options.total;
+    let max = this.options.visible;
+    let current = this.options.current;
 
-  return Array.from({ length: Math.min(total, max) }, (_, i) => i + 1 + from);
-};
+    console.log(total, max, current);
 
-export default class PaginationButton {
-  constructor(container, callback = () => {}) {
-    this.container = container;
-    this.callback = callback;
+    const half = Math.floor(max / 2);
+    let to = max;
+
+    if (current + half >= total) {
+      to = total;
+    } else if (current > half) {
+      to = current + half;
+    }
+
+    let from = Math.max(to - max, 0);
+
+    this.pages = Array.from(
+      { length: Math.min(total, max) },
+      (_, i) => i + 1 + from
+    );
   }
 
-  render(totalPages, maxPagesVisible = 10, currentPage = 1) {
-    this._remove();
-
-    let pages = pageNumbers(totalPages, maxPagesVisible, currentPage);
-    let currentPageBtn = null;
-    const buttons = new Map();
-    const disabled = {
-      start: () => pages[0] === 1,
-      prev: () => currentPage === 1 || currentPage > totalPages,
-      end: () => pages.slice(-1)[0] === totalPages,
-      next: () => currentPage >= totalPages,
-    };
-    const frag = document.createDocumentFragment();
-    const paginationButtonContainer = document.createElement("div");
-    paginationButtonContainer.className = "pagination-buttons";
-
-    const createAndSetupButton = (
-      label = "",
-      cls = "",
-      disabled = false,
-      handleClick
-    ) => {
-      const buttonElement = document.createElement("button");
-      buttonElement.textContent = label;
-      buttonElement.className = `page-btn ${cls}`;
-      buttonElement.disabled = disabled;
-      buttonElement.addEventListener("click", (e) => {
-        handleClick(e);
-        this.update();
-        paginationButtonContainer.value = currentPage;
-        paginationButtonContainer.dispatchEvent(
-          new CustomEvent("change", { detail: { currentPageBtn } })
-        );
-      });
-
-      return buttonElement;
-    };
-
-    const onPageButtonClick = (e) =>
-      (currentPage = Number(e.currentTarget.textContent));
-
-    const onPageButtonUpdate = (index) => (btn) => {
-      btn.textContent = pages[index];
-
-      if (pages[index] === currentPage) {
-        currentPageBtn.classList.remove("page-btn--active");
-        btn.classList.add("page-btn--active");
-        currentPageBtn = btn;
-        currentPageBtn.focus();
-      }
-    };
-
-    buttons.set(
-      createAndSetupButton(
-        "",
-        "start-page",
-        disabled.start(),
-        () => (currentPage = 1)
-      ),
-      (btn) => (btn.disabled = disabled.start())
-    );
-
-    buttons.set(
-      createAndSetupButton(
-        "",
-        "prev-page",
-        disabled.prev(),
-        () => (currentPage -= 1)
-      ),
-      (btn) => (btn.disabled = disabled.prev())
-    );
-
-    pages.map((pageNumber, index) => {
-      const isCurrentPage = currentPage === pageNumber; // RETURNS BOOLEAN
-      const button = createAndSetupButton(
-        pageNumber,
-        isCurrentPage ? "page-btn--active" : "",
-        false,
-        onPageButtonClick
+  _generateMarkup() {
+    let start = () => disabled(this.pages[0] === 1);
+    let prev = () =>
+      disabled(
+        this.options.current === 1 || this.options.current > this.options.total
       );
+    let end = () => disabled(this.pages.slice(-1)[0] === this.options.total);
+    let next = () => disabled(this.options.current >= this.options.total);
+    let disabled = (boolean) => (boolean ? "disabled" : "");
 
-      if (isCurrentPage) {
-        currentPageBtn = button;
-      }
-
-      buttons.set(button, onPageButtonUpdate(index));
-    });
-
-    buttons.set(
-      createAndSetupButton(
-        "",
-        "next-page",
-        disabled.next(),
-        () => (currentPage += 1)
-      ),
-      (btn) => (btn.disabled = disabled.next())
-    );
-
-    buttons.set(
-      createAndSetupButton(
-        "",
-        "end-page",
-        disabled.end(),
-        () => (currentPage = totalPages)
-      ),
-      (btn) => (btn.disabled = disabled.end())
-    );
-
-    buttons.forEach((_, btn) => frag.appendChild(btn));
-    paginationButtonContainer.appendChild(frag);
-
-    // MUST BE INVOKED WITHOUT CALLING
-    // this.append = () => {
-    this.container.appendChild(paginationButtonContainer);
-    // };
-
-    this.update = (newPageNumber = currentPage) => {
-      currentPage = newPageNumber;
-      pages = pageNumbers(totalPages, maxPagesVisible, currentPage);
-      buttons.forEach((updateButton, btn) => updateButton(btn));
-    };
-
-    // this.onChange = () => {
-    paginationButtonContainer.addEventListener("change", (e) => {
-      this.callback(e);
-    });
-    // };
+    return `
+        <button type="button" class="page-btn start-page" ${start()}></button>
+        <button type="button" class="page-btn prev-page" ${prev()}></button>
+        ${this.pages
+          .map((page) => {
+            console.log();
+            return ` 
+            <button type="button" class="page-btn ${
+              parseInt(page) === this.options.current ? "page-btn--active" : ""
+            }">${page}</button>
+          `;
+          })
+          .join("")}
+        <button type="button" class="page-btn next-page" ${next()}></button>
+        <button type="button" class="page-btn end-page" ${end()}></button>
+      `;
   }
 
-  _remove() {
-    const el = document.querySelector(".pagination-buttons");
+  _handleClick(el) {
+    if (el.matches(".start-page")) {
+      this.options.current = 1;
+      this._update();
+      return;
+    }
 
-    if (el) el.remove();
+    if (el.matches(".prev-page")) {
+      this.options.current -= 1;
+      this._update();
+      return;
+    }
+
+    if (el.matches(".next-page")) {
+      this.options.current += 1;
+      this._update();
+      return;
+    }
+
+    if (el.matches(".end-page")) {
+      this.options.current = this.options.total;
+      this._update();
+      return;
+    }
+
+    this.options.current = Number(el.innerText);
+    this._update();
+  }
+
+  _update() {
+    this._generatePageNumbers();
+    const newMarkup = this._generateMarkup();
+    const newDOM = document.createRange().createContextualFragment(newMarkup);
+    const newElements = Array.from(newDOM.querySelectorAll("*"));
+    const currentElements = Array.from(this.element.querySelectorAll("*"));
+
+    this.element.innerHTML = this._generateMarkup();
+
+    this.options.callback(this.options.current);
+  }
+
+  newPage(total) {
+    this.options.total = total;
+    this._update();
   }
 }
-
-// let paginationButtons = new PaginationButton(10, 5);
-
-// paginationButtons.render();
-
-// paginationButtons.onChange((e) => {
-//   console.log("-- changed", e.target.value);
-// });
-
-// document.querySelector("#btn").addEventListener("click", (e) => {
-//   paginationButtons = new PaginationButton(5, 5);
-//   paginationButtons.render();
-// });

@@ -1088,65 +1088,64 @@ body * {
 }
 /* PAGINATION */
 .pagination-buttons {
-  --pagination-button: #adb5bd;
-  --pagination-button-active: #6c757d;
-  --pagination-button-disabled: #dee2e6;
-  --pagination-button-selected: #495057;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: none;
+  font-size: 18px;
+  padding: var(--padding);
+}
 
-  /* position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0; */
-  text-align: center;
-  padding: 0;
-  margin: calc(var(--padding) * 2) 0;
-}
-.pagination-buttons,
-.pagination-buttons * {
-  box-sizing: border-box;
-}
 .page-btn {
-  padding: 0;
-  border: none;
-  outline: none;
   background: none;
+  appearance: none;
   -webkit-appearance: none;
   -ms-appearance: none;
   -moz-appearance: none;
-
-  height: 20px;
-  width: 20px;
+  border: none;
+  cursor: pointer;
 
   font-family: "Figtree", sans-serif;
-  font-size: 14px;
-  vertical-align: middle;
-  text-align: center;
-  color: var(--pagination-button);
-  font-weight: 300;
 
-  transition: color 0.15s;
-}
-.page-btn--active {
-  color: var(--pagination-button-selected);
-  font-weight: 500;
-  text-decoration: underline;
-}
-.page-btn:hover {
-  color: var(--pagination-button-selected);
-}
-.page-btn:not(:last-of-type) {
-  margin-right: 10px;
-}
-.page-btn:active {
-  color: var(--pagination-button-active);
+  /* background: #dee2e6; */
+  color: #adb5bd;
+  height: 30px;
+  border-radius: 50%;
+  padding: 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
 }
 .page-btn:disabled {
-  opacity: 0.3;
+  cursor: none;
 }
-.page-btn:not(:disabled) {
-  cursor: pointer;
+.page-btn:not([class$="-page"]) {
+  font-weight: 300;
+  width: 30px;
 }
 
+.page-btn[class$="-page"] {
+  /* background: #ced4da; */
+  font-weight: 500;
+  font-size: 0.6em;
+  font-weight: bold;
+}
+
+.page-btn--active {
+  font-weight: 700;
+  border-color: 1px solid;
+  background: #dee2e6;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+.page-btn[disabled] {
+  opacity: 0.3;
+}
 .start-page::before {
   content: "\e5dc";
   font-family: "Material Icons";

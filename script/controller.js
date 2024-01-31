@@ -57,7 +57,7 @@ const renderMain = () => {
       renderMenu();
       renderDashboard();
       //RENDER PAGINATION MUST BE INOVOKE PRIOR TO TABLE
-      renderPagination();
+      // renderPagination();
       renderTable();
       renderFilter();
       renderCalendar();
@@ -189,8 +189,11 @@ const renderTable = () => {
     username: model.state.username,
     team: model.state.team,
     data: model.state.table,
-    callbackPagination: (params) => {
-      pagination.render(params);
+    callbackPagination: (totalPage) => {
+      pagination.newPage(totalPage);
+    },
+    callbackInit: (totalPage) => {
+      renderPagination(totalPage);
     },
     callbackFilter: (boolean) => {
       filter.reset(boolean);
@@ -206,9 +209,13 @@ const renderFilter = () => {
 };
 
 // RENDER PAGINATION
-const renderPagination = () => {
-  pagination = new Pagination(sections[1], (e) => {
-    table.page(e.target.value);
+const renderPagination = (totalPage) => {
+  pagination = new Pagination({
+    container: sections[1],
+    total: totalPage,
+    callback: (page) => {
+      table.page(page);
+    },
   });
 };
 

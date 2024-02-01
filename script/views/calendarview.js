@@ -56,15 +56,15 @@ export default class Calendar {
         </div>
       </div>
       <div class="calendar__footer">
-        <span class="footer1">
+        <div class="footer__content footer__content--1">
             completed my steps <strong>AND</strong> joined a class or a workout
-        </span>
-        <span class="footer2">
+        </div>
+        <div class="footer__content footer__content--2">
             completed my steps <strong>OR</strong> joined a class or a workout
-        </span>
-        <span class="footer3">
+        </div>
+        <div class="footer__content footer__content--3">
            it was a tough day, wasn't able to do either
-        </span>
+        </div>
       </div>
     </div>
   </div>`;

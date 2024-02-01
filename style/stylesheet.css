@@ -505,7 +505,7 @@ body * {
 .day--next {
   opacity: 0.5;
 }
-.day::before,
+.day:before,
 .day::after {
   content: "";
   font-family: "Material Icons";
@@ -516,19 +516,21 @@ body * {
   text-align: center;
   top: -15px;
 }
-.day--checked::after,
+
 .day--starred::after {
+  content: "\e877";
+  color: rgba(25, 135, 84, 1);
+}
+.day--checked::after {
   content: "\e876";
   color: rgba(25, 135, 84, 1);
 }
 .day--starred::before {
   content: "\f0ec";
-  font-family: "Material Icons";
   color: rgba(255, 193, 7, 1);
 }
 .day--neither::before {
-  content: "\e876";
-  font-family: "Material Icons";
+  content: "\2022";
   color: #dc3545;
 }
 .date-number {
@@ -551,32 +553,41 @@ body * {
 
 .calendar__footer {
   margin: var(--margin);
-  display: flex;
-  flex-direction: column;
 }
-.calendar__footer > span,
-.calendar__footer > span > strong {
+.footer__content {
+  position: relative;
+  padding-left: calc(var(--padding) * 1.5);
+}
+.footer__content,
+.footer__content > strong {
   font-size: 0.75rem;
   color: var(--gray-dark);
 }
-.calendar__footer > span:not(:last-of-type) {
+.footer__content:not(:last-of-type) {
   margin-bottom: var(--margin);
 }
-.calendar__footer > span::before {
+.footer__content::before,
+.footer__content::after {
   font-family: "Material Icons";
+  position: absolute;
+  left: 0;
 }
-.calendar__footer > span:nth-of-type(1)::before {
+.footer__content--1::before {
   content: "\f0ec";
-  font-family: "Material Icons";
   color: rgba(255, 193, 7, 1);
 }
-.calendar__footer > span:nth-of-type(2)::before {
-  content: "\e876";
 
+.footer__content--1::after {
+  content: "\e877";
+  color: rgba(25, 135, 84, 1);
+  top: 0;
+}
+.footer__content--2::before {
+  content: "\e876";
   color: rgba(25, 135, 84, 1);
 }
-.calendar__footer > span:nth-of-type(3)::before {
-  content: "\e876";
+.footer__content--3::before {
+  content: "\2022";
   font-family: "Material Icons";
   color: #dc3545;
 }

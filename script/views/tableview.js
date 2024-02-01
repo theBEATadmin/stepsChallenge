@@ -21,9 +21,9 @@ export default class Table {
 
     //  THIS PROCESS SHOULD BE IN THE MODEL
     // NO NEED TO BE SORTED BECAUSE THE SORUCE THE DATA IS ALREADY RANKED
-    this.options.data.team = this.options.data.rows.filter(
-      (datum) => datum[3] === this.options.team
-    );
+    this.options.data.team = JSON.parse(
+      JSON.stringify(this.options.data.rows)
+    ).filter((datum) => datum[3] === this.options.team);
 
     let ranks = [
       ...new Set(this.options.data.team.map((datum) => Number(datum[2]))),

@@ -21,17 +21,31 @@ export default class Table {
 
     //  THIS PROCESS SHOULD BE IN THE MODEL
     // NO NEED TO BE SORTED BECAUSE THE SORUCE THE DATA IS ALREADY RANKED
-    this.options.data.team = JSON.parse(
-      JSON.stringify(this.options.data.rows)
-    ).filter((datum) => datum[3] === this.options.team);
+    //
+
+    this.rankingAll = JSON.parse(JSON.stringify(this.options.data.rows));
+
+    this.rankingTeam = JSON.parse(JSON.stringify(this.rankingAll)).filter(
+      (datum) => datum[3] === this.options.team
+    );
 
     let ranks = [
-      ...new Set(this.options.data.team.map((datum) => Number(datum[2]))),
+      ...new Set(this.rankingTeam.map((datum) => Number(datum[2]))),
     ].sort((a, b) => a - b);
 
-    this.options.data.team.forEach((datum) => {
+    this.rankingTeam.forEach((datum) => {
       let index = ranks.findIndex((rank) => rank === Number(datum[2]));
       datum[0] = index + 1;
+    });
+
+    // CONVERT NUMBER TO STRING FORM
+    // STEPS IS AT INDEX  2
+    this.rankingTeam.forEach((datum) => {
+      datum[2] = this._formatNumber(datum[2]);
+    });
+
+    this.rankingAll.forEach((datum) => {
+      datum[2] = this._formatNumber(datum[2]);
     });
 
     this.element;
@@ -48,12 +62,21 @@ export default class Table {
     );
   }
 
+  _formatNumber(num) {
+    const numberFormat = new Intl.NumberFormat("en-US");
+
+    num = parseInt(num);
+    console.log(num);
+    if (isNaN(num) || num === 0) return "-";
+
+    return numberFormat.format(num);
+  }
   _reset() {
     this.filtered = false;
     this.pageNumber = 1;
     this.maxRows = 10;
     this.maxColumns = 4;
-    this.filteredRows = this.options.data.rows;
+    this.filteredRows = this.rankingAll;
     this.renderRows = [];
   }
   // THIS FUNCTIONS SUPERCEDED THE _addHeader AND _addRows
@@ -105,15 +128,13 @@ export default class Table {
     this.filtered = str === "true";
     this.pageNumber = 1;
 
-    this.filteredRows = this.filtered
-      ? this.options.data.team
-      : this.options.data.rows;
+    this.filteredRows = this.filtered ? this.rankingTeam : this.rankingAll;
 
     /* this.filteredRows = this.filtered
-      ? this.options.data.rows.filter((row) => {
+      ? this.rankingAll.filter((row) => {
           return row[3] === this.options.team;
         })
-      : this.options.data.rows; */
+      : this.rankingAll; */
 
     this._update();
 

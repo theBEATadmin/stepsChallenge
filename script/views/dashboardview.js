@@ -29,7 +29,6 @@ export default class DashboardView {
     const numberFormat = new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 0,
     });
-    console.log(num);
     return numberFormat.format(parseInt(num));
   }
 

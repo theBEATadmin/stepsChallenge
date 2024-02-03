@@ -33,7 +33,7 @@ export default class Table {
 
     let ranks = [
       ...new Set(this.rankingTeam.map((datum) => Number(datum[2]))),
-    ].sort((a, b) => a - b);
+    ].sort((a, b) => b - a);
 
     this.rankingTeam.forEach((datum) => {
       let index = ranks.findIndex((rank) => rank === Number(datum[2]));

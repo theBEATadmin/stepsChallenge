@@ -35,6 +35,12 @@ export default class Popup {
   }
 
   _addListeners() {
+    this.element.addEventListener("click", (e) => {
+      if (e.target === this.element) {
+        this._close();
+      }
+    });
+
     this.element.querySelector("button").addEventListener("click", (e) => {
       e.preventDefault();
       this._close();

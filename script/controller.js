@@ -15,8 +15,9 @@ import Table from "./views/tableview.js";
 
 import Calendar from "./views/calendarview.js";
 import Confirm from "./views/confirmview.js";
-import StepsForm from "./views/formsteps.js";
+import ProgressForm from "./views/formprogress.js";
 import TrackerForm from "./views/formtracker.js";
+import Popup from "./views/popupview.js";
 
 let login,
   spinner,
@@ -27,8 +28,9 @@ let login,
   pagination,
   table,
   calendar,
-  stepsform,
-  trackerform;
+  progress,
+  popup,
+  tracker;
 let sections;
 
 // LOGIN
@@ -45,6 +47,41 @@ const renderLogin = () => {
   login.render();
 };
 
+// PROGRESS FORM
+
+const initProgress = () => {
+  progress = new ProgressForm({
+    username: model.state.username,
+    data: model.state.userData.steps,
+    submitCallback: (data) => {
+      let params = {
+        data: data,
+        id: config.STEPS_ID,
+      };
+
+      submitSteps(params);
+    },
+  });
+};
+
+const initTracker = () => {
+  tracker = new TrackerForm({
+    username: model.state.username,
+    data: model.state.userData.tracker,
+    submitCallback: (data) => {
+      let params = {
+        data: data,
+        id: config.TRACKER_ID,
+      };
+
+      submitTracker(params);
+    },
+  });
+};
+
+const initPopup = () => {
+  popup = new Popup();
+};
 //MAIN
 const renderMain = () => {
   // MAIN CONTAINER
@@ -56,13 +93,14 @@ const renderMain = () => {
       sections = document.querySelectorAll("section");
       renderMenu();
       renderDashboard();
-      //RENDER PAGINATION MUST BE INOVOKE PRIOR TO TABLE
+      //RENDER PAGINATION MUST BE INOVOKE AFTER TO TABLE
       // renderPagination();
+      initProgress();
+      initTracker();
       renderTable();
       renderFilter();
       renderCalendar();
-      stepsform = new StepsForm();
-      trackerform = new TrackerForm();
+      initPopup();
     },
   });
 
@@ -76,91 +114,25 @@ const renderMenu = () => {
 
     // FOCUS DASHBOARD
     callbackButton1: () => {
-      new Confirm({
-        title: `Dashboard| ${
-          model.state.username.charAt(0).toUpperCase() +
-          model.state.username.slice(1)
-        } | ${new Date().toDateString()}`,
-        message: dashboard.import(),
-        okText: "Close",
-        cancelButton: false,
-      });
+      popup.open(
+        model.state.username,
+        `Progress Dashboard`,
+        dashboard.import()
+      );
     },
 
     // FOCUS FORM
     callbackButton2: () => {
-      new Confirm({
-        title: `Daily Tracker | ${
-          model.state.username.charAt(0).toUpperCase() +
-          model.state.username.slice(1)
-        } | ${new Date().toDateString()}`,
-        message: calendar.import(),
-        okText: "Close",
-        cancelButton: false,
-      });
+      popup.open(model.state.username, `Daily Tracker`, calendar.import());
     },
 
     callbackButton3: () => {
-      new Confirm({
-        title: `Update Tracker | ${
-          model.state.username.charAt(0).toUpperCase() +
-          model.state.username.slice(1)
-        } | ${new Date().toDateString()}`,
-        message: trackerform.import(),
-        okText: "Submit",
-        cancelText: "Cancel",
-        onok: (el) => {
-          let activity = Array.from(el.querySelectorAll(".radio__input")).find(
-            (input) => input.checked
-          );
-
-          let rating = Array.from(
-            el.querySelectorAll(".rating__input")
-          ).findIndex((input) => input.checked);
-
-          if (activity == undefined && rating == -1) {
-            window.alert("Form is blank");
-            return;
-          }
-
-          submitTracker({
-            data: {
-              activity:
-                activity
-                  ?.closest(".radio")
-                  .querySelector(".radio__text")
-                  .innerText.trim() ?? "",
-              rating: rating == -1 ? "" : rating,
-            },
-            id: config.TRACKER_ID,
-          });
-        },
-      });
+      tracker.open();
     },
 
     // STEPS
     callbackButton4: () => {
-      new Confirm({
-        title: `Record Progress | ${
-          model.state.username.charAt(0).toUpperCase() +
-          model.state.username.slice(1)
-        } | ${new Date().toDateString()}`,
-        message: stepsform.import(),
-        okText: "Submit",
-        cancelText: "Cancel",
-        onok: (el) => {
-          let data = {};
-
-          el.querySelectorAll("input").forEach(
-            (input) => (data[input.name] = input.value)
-          );
-
-          submitSteps({
-            data: data,
-            id: config.STEPS_ID,
-          });
-        },
-      });
+      progress.open();
     },
 
     callbackLogout: () => {
@@ -235,9 +207,10 @@ const init = () => {
     callback: () => {},
   });
 
-  // localStorage.removeItem("state");
-  if (model.isLoggedIn()) {
-    renderMain();
+  let params = model.isLoggedIn();
+
+  if (params) {
+    loginAccount(params);
     return;
   }
 
@@ -250,7 +223,9 @@ const loginAccount = async (params) => {
   try {
     spinner.render();
     await model.loadData(params);
-    login.remove();
+
+    if (login) login.remove();
+
     renderMain();
   } catch (error) {
     alert(error.message);
@@ -261,26 +236,26 @@ const loginAccount = async (params) => {
 
 const submitSteps = async (params) => {
   try {
-    spinner.render();
     await model.submitStepData(params);
 
     dashboard.update(model.state.dashboard);
     table.refresh(model.state.table);
+    progress.successCallback(true);
+    alert("Success! Today's PROGRESS has been recorded");
   } catch (error) {
-    alert(error.message);
+    errorCallback(error);
   } finally {
-    spinner.remove();
   }
 };
 
 const submitTracker = async (params) => {
   try {
-    spinner.render();
     await model.submitTrackerData(params);
     calendar.refresh(model.state.calendar);
+    tracker.successCallback(true);
+    alert("Success! Today's TRACKER has been recorded");
   } catch (error) {
-    alert(error.message);
+    errorCallback(error);
   } finally {
-    spinner.remove();
   }
 };

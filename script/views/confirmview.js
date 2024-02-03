@@ -1,3 +1,5 @@
+import * as utils from "../utils.js";
+
 export default class Confirm {
   constructor(options) {
     this.options = Object.assign(

@@ -1,3 +1,5 @@
+import * as utils from "../utils.js";
+
 export default class Table {
   constructor(options) {
     this.options = Object.assign(
@@ -23,11 +25,11 @@ export default class Table {
     // NO NEED TO BE SORTED BECAUSE THE SORUCE THE DATA IS ALREADY RANKED
     //
 
-    this.rankingAll = JSON.parse(JSON.stringify(this.options.data.rows));
+    this.rankingAll = utils.deepCopy(this.options.data.rows);
 
-    this.rankingTeam = JSON.parse(JSON.stringify(this.rankingAll)).filter(
-      (datum) => datum[3] === this.options.team
-    );
+    this.rankingTeam = utils
+      .deepCopy(this.rankingAll)
+      .filter((datum) => datum[3] === this.options.team);
 
     let ranks = [
       ...new Set(this.rankingTeam.map((datum) => Number(datum[2]))),
@@ -63,13 +65,10 @@ export default class Table {
   }
 
   _formatNumber(num) {
-    const numberFormat = new Intl.NumberFormat("en-US");
-
     num = parseInt(num);
-    console.log(num);
     if (isNaN(num) || num === 0) return "-";
 
-    return numberFormat.format(num);
+    return utils.standardNumberFormat.format(num);
   }
   _reset() {
     this.filtered = false;

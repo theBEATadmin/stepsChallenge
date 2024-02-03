@@ -1,3 +1,5 @@
+import * as config from "../config.js";
+
 export default class MainView {
   constructor(options) {
     this.options = Object.assign(
@@ -20,7 +22,7 @@ export default class MainView {
       <hr />
       <div class="header__info">
       <div class="header__participant">${this.options.username}</div>
-      <div class="header__date">${new Date().toDateString()}</div>
+      <div class="header__date">${config.DATE_TODAY.toDateString()}</div>
       </div>
     </header>
 

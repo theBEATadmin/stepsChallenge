@@ -35,8 +35,6 @@ export default class PaginationButtons {
     let max = this.options.visible;
     let current = this.options.current;
 
-    console.log(total, max, current);
-
     const half = Math.floor(max / 2);
     let to = max;
 

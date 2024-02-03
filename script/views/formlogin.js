@@ -37,7 +37,7 @@ export default class LoginView {
         <input
         type="text"
         name="registration"
-        placeholder="Registration No.*"
+        placeholder="Membership number*"
         class="form__input"
         autocomplete="off"
         required

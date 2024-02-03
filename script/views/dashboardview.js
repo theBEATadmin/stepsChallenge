@@ -1,3 +1,5 @@
+import * as utils from "../utils.js";
+
 export default class DashboardView {
   constructor(options) {
     this.options = Object.assign(
@@ -26,10 +28,8 @@ export default class DashboardView {
 
   _formatNumber(num) {
     if (isNaN(num) || num == 0 || num == null) return "-";
-    const numberFormat = new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 0,
-    });
-    return numberFormat.format(parseInt(num));
+
+    return utils.standardNumberFormat.format(parseInt(num));
   }
 
   _generateMarkup() {

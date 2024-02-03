@@ -1,5 +1,8 @@
 "use strict";
 
+import * as utils from "./utils.js";
+import * as config from "./config.js";
+
 export let state = {
   username: "",
   password: "",
@@ -32,12 +35,8 @@ export let state = {
 };
 
 export const loadData = async function (params) {
-  // state.username = params.data.username;
-  // state.registration = params.data.registration;
-  // state.now = mediumDateFormat.format(new Date());
-  // state.date = shortDateFormat.format(new Date());
-
   resetObject(params);
+  console.log(params);
   let formData = new FormData();
   formData.append("data", JSON.stringify(state));
 
@@ -74,7 +73,7 @@ export const loadData = async function (params) {
       state.calendar = getCalendarDates();
     }
 
-    localStorage.setItem("state", JSON.stringify(state));
+    localStorage.setItem("params", JSON.stringify(params));
   } catch (error) {
     throw Error(error);
   }
@@ -87,8 +86,8 @@ export const submitStepData = async function (params) {
     steps: params.data.steps,
     minutes: params.data.minutes,
     team: state.team,
-    now: mediumDateFormat.format(new Date()),
-    date: shortDateFormat.format(new Date()),
+    now: utils.standardDateFormat.format(config.DATE_TODAY),
+    date: utils.shortDateFormat.format(config.DATE_TODAY),
   };
 
   let formData = new FormData();
@@ -117,26 +116,24 @@ export const submitStepData = async function (params) {
     if (state.userData.steps.length) {
       processDashboardData();
     }
-
-    localStorage.setItem("state", JSON.stringify(state));
   } catch (error) {
     throw Error(error);
   }
 };
 
 export const submitTrackerData = async function (params) {
-  let stepData = {
+  let trackerData = {
     username: state.username,
     registration: state.registration,
     steps: params.data.activity,
     minutes: params.data.rating,
     team: state.team,
-    now: mediumDateFormat.format(new Date()),
-    date: shortDateFormat.format(new Date()),
+    now: utils.standardDateFormat.format(config.DATE_TODAY),
+    date: utils.shortDateFormat.format(config.DATE_TODAY),
   };
 
   let formData = new FormData();
-  formData.append("data", JSON.stringify(stepData));
+  formData.append("data", JSON.stringify(trackerData));
 
   try {
     const response = await fetch(
@@ -156,41 +153,28 @@ export const submitTrackerData = async function (params) {
     if (state.userData.tracker.length) {
       state.calendar = getCalendarDates();
     }
-
-    localStorage.setItem("state", JSON.stringify(state));
   } catch (error) {
     throw Error(error);
   }
 };
 
 export const clearItem = () => {
-  localStorage.removeItem("state");
+  localStorage.removeItem("params");
 };
 
 export const isLoggedIn = () => {
-  if (JSON.parse(localStorage.getItem("state"))) {
-    state = JSON.parse(localStorage.getItem("state"));
-    console.log(state);
-    return true;
+  if (JSON.parse(localStorage.getItem("params"))) {
+    return JSON.parse(localStorage.getItem("params"));
   }
 };
-
-const shortDateFormat = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "short",
-});
-
-const mediumDateFormat = new Intl.DateTimeFormat("en-US", {
-  timeStyle: "medium",
-  dateStyle: "short",
-});
 
 // CLEAR OBJECT
 const resetObject = (params) => {
   state = {
     username: params.data.username,
     registration: params.data.registration,
-    date: shortDateFormat.format(new Date()),
-    now: mediumDateFormat.format(new Date()),
+    date: utils.shortDateFormat.format(config.DATE_TODAY),
+    now: utils.standardDateFormat.format(config.DATE_TODAY),
     team: "",
     steps: [],
     tracker: [],
@@ -292,7 +276,7 @@ const processDashboardData = () => {
 
 const getStepsToday = () => {
   const result = state.userData.steps.find((datum) => {
-    if (shortDateFormat.format(new Date(datum.date)) == state.date)
+    if (utils.shortDateFormat.format(new Date(datum.date)) == state.date)
       return datum;
   });
 

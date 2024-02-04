@@ -21,9 +21,26 @@ export default class Table {
       options
     );
 
+    this.rankingAll;
+    this.rankingTeam;
+    this.element;
+
+    // SET INTIAL VALUES
+    this._arrange();
+    this._reset();
+
+    this.element = document.createElement("table");
+    this.element.classList.add("table");
+    this.element.innerHTML = this._generateMarkup();
+    this.options.container.insertAdjacentElement("afterbegin", this.element);
+    this.options.callbackInit(
+      Math.ceil(this.filteredRows.length / this.maxRows)
+    );
+  }
+
+  _arrange() {
     //  THIS PROCESS SHOULD BE IN THE MODEL
     // NO NEED TO BE SORTED BECAUSE THE SORUCE THE DATA IS ALREADY RANKED
-    //
 
     this.rankingAll = utils.deepCopy(this.options.data.rows);
 
@@ -49,21 +66,7 @@ export default class Table {
     this.rankingAll.forEach((datum) => {
       datum[2] = this._formatNumber(datum[2]);
     });
-
-    this.element;
-
-    // SET INTIAL VALUES
-    this._reset();
-
-    this.element = document.createElement("table");
-    this.element.classList.add("table");
-    this.element.innerHTML = this._generateMarkup();
-    this.options.container.insertAdjacentElement("afterbegin", this.element);
-    this.options.callbackInit(
-      Math.ceil(this.filteredRows.length / this.maxRows)
-    );
   }
-
   _formatNumber(num) {
     num = parseInt(num);
     if (isNaN(num) || num === 0) return "-";
@@ -84,7 +87,6 @@ export default class Table {
     const startIndex = (this.pageNumber - 1) * this.maxRows;
     const endIndex = startIndex + this.maxRows;
     const rows = this.filteredRows.slice(startIndex, endIndex);
-
     return `<thead>
     <tr>
       ${this.options.data.header
@@ -129,26 +131,20 @@ export default class Table {
 
     this.filteredRows = this.filtered ? this.rankingTeam : this.rankingAll;
 
-    /* this.filteredRows = this.filtered
-      ? this.rankingAll.filter((row) => {
-          return row[3] === this.options.team;
-        })
-      : this.rankingAll; */
-
     this._update();
-
     this.options.callbackPagination(
       Math.ceil(this.filteredRows.length / this.maxRows)
     );
   }
 
-  page(num) {
+  pagination(num) {
     this.pageNumber = num;
     this._update();
   }
 
   refresh(data) {
     this.options.data = data;
+    this._arrange();
     this._reset();
     this._update();
     this.options.callbackFilter(true);

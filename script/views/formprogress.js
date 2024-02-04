@@ -39,16 +39,21 @@ export default class ProgressForm {
     <h3 class="popup__subtitle">${utils.toCamelCase(
       this.options.username
     )} | Week ${utils.countWeeks()} of 8 | Day ${utils.countDays()} of 56 </h3>
-    </br>
+    <br/>
     <p class="popup__text">Active minutes is the total time you spent walking and/or duoing a workout</p>
     <div class="form__inputs">
       <label for="stepsInp" class="form__label">Step:</label>
-      <input id="stepsInp" type="number" name="steps" class="form__input" />
+      <input id="stepsInp" type="number" name="steps" class="form__input"  autocomplete="off"/>
       <span class="form__error"><strong style="color: red;">&#33;</strong> Input your steps</span>
     </div>
     <div class="form__inputs">
-      <label for="inpPassword" class="form__label">Name</label>
-      <input id="inpPassword" type="number" name="minutes" class="form__input input--popup" />
+      <label for="inpPassword" class="form__label">Minutes:</label>
+      <input id="inpPassword" type="number" name="minutes" class="form__input input--popup" autocomplete="off"/>
+      <span class="form__error"><strong style="color: red;">&#33;</strong> Input active minutes</span>
+    </div>
+    <div class="form__inputs">
+      <label for="inpFile" class="form__label">Upload Steps Photo:</label>
+      <input id="inpFile" name="attachment" type="file" accept="image/png" class="form__input"/>
       <span class="form__error"><strong style="color: red;">&#33;</strong> Input active minutes</span>
     </div>
     <div class="buttons">      
@@ -84,7 +89,7 @@ export default class ProgressForm {
     this.btnSubmit.addEventListener("click", (e) => {
       e.preventDefault();
 
-      const validInputs = this.inputs.filter((input) => {
+      [this.inputs[0], this.inputs[1]].forEach((input) => {
         if (input.value == "") {
           input.nextElementSibling.classList.add("form__error--visible");
         } else {
@@ -92,16 +97,38 @@ export default class ProgressForm {
         }
       });
 
-      if (this.inputs.length !== validInputs.length) return;
+      if (this.inputs[0].value == "" || this.inputs[1].value == "") return;
 
       if (this.boolean) {
-        alert("Data already submitted");
+        alert("You've already submitted an entry today!");
         return;
       }
+
       this._toggleControls(true);
+
       let data = {};
+
       this.inputs.forEach((input) => (data[input.name] = input.value));
-      this.options.submitCallback(data);
+
+      //ADD IF THERE'S AN ATTACHMENT
+      const file = this.inputs[2].files[0];
+      if (file) {
+        const fileReader = new FileReader();
+
+        fileReader.onload = () => {
+          // DON'T CHANGE KEYS, USED IN WRITING DATA IN GOOGLE DIRVE
+          data.attachment = {
+            fileName: this.options.username,
+            mimeType: file.type,
+            data: fileReader.result,
+          };
+          console.log(data);
+          this.options.submitCallback(data);
+        };
+        fileReader.readAsDataURL(file);
+      } else {
+        this.options.submitCallback(data);
+      }
     });
   }
 

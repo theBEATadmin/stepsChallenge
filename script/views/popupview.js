@@ -24,7 +24,7 @@ export default class Popup {
       this.username
     )} | Week ${utils.countWeeks()} of 8 | Day ${utils.countDays()} of 56 </h3>
     
-    </br>
+    <br/>
     ${this.content}
   </div>
 </div>`;

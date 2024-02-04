@@ -15,19 +15,6 @@ export default class PaginationButtons {
     this.currentPageButton = null;
     this.element = document.createElement("div");
     this.element.className = "pagination-buttons";
-
-    this._generatePageNumbers();
-    this.element.innerHTML = this._generateMarkup();
-
-    this.element.addEventListener("click", (e) => {
-      e.preventDefault();
-      const el = e.target.closest(".page-btn");
-
-      if (!el) return;
-      this._handleClick(el);
-    });
-
-    this.options.container.appendChild(this.element);
   }
 
   _generatePageNumbers() {
@@ -81,32 +68,34 @@ export default class PaginationButtons {
   }
 
   _handleClick(el) {
+    let otherPages = true;
+
     if (el.matches(".start-page")) {
       this.options.current = 1;
-      this._update();
-      return;
+      otherPages = false;
     }
 
     if (el.matches(".prev-page")) {
       this.options.current -= 1;
-      this._update();
-      return;
+      otherPages = false;
     }
 
     if (el.matches(".next-page")) {
       this.options.current += 1;
-      this._update();
-      return;
+      otherPages = false;
     }
 
     if (el.matches(".end-page")) {
       this.options.current = this.options.total;
-      this._update();
-      return;
+      otherPages = false;
     }
 
-    this.options.current = Number(el.innerText);
+    if (otherPages) {
+      this.options.current = Number(el.innerText);
+    }
+
     this._update();
+    this.options.callback(this.options.current);
   }
 
   _update() {
@@ -117,11 +106,26 @@ export default class PaginationButtons {
     const currentElements = Array.from(this.element.querySelectorAll("*"));
 
     this.element.innerHTML = this._generateMarkup();
-
-    this.options.callback(this.options.current);
   }
 
-  newPage(total) {
+  show(total) {
+    this.options.total = total;
+    this._generatePageNumbers();
+    this.element.innerHTML = this._generateMarkup();
+
+    this.element.addEventListener("click", (e) => {
+      e.preventDefault();
+      const el = e.target.closest(".page-btn");
+
+      if (!el) return;
+      this._handleClick(el);
+    });
+
+    this.options.container.appendChild(this.element);
+  }
+
+  refresh(total) {
+    this.options.current = 1;
     this.options.total = total;
     this._update();
   }

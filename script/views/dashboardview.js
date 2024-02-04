@@ -83,18 +83,17 @@ export default class DashboardView {
 
   update(data) {
     this.options.data = data;
-
     const newMarkup = this._generateMarkup();
     const newDOM = document.createRange().createContextualFragment(newMarkup);
     const newElements = Array.from(
       newDOM.querySelectorAll(
-        ".dashboard-contents__number,dashboard-content__number"
+        ".dashboard-contents__number,.dashboard-content__number"
       )
     );
 
     const currentElements = Array.from(
       this.element.querySelectorAll(
-        ".dashboard-contents__number,dashboard-content__number"
+        ".dashboard-contents__number,.dashboard-content__number"
       )
     );
 

@@ -39,7 +39,7 @@ export default class ProgressForm {
     <h3 class="popup__subtitle">${utils.toCamelCase(
       this.options.username
     )} | Week ${utils.countWeeks()} of 8 | Day ${utils.countDays()} of 56 </h3>
-      </br>
+      <br/>
     <p class="popup__text"><strong>Today, I</strong>...</p>
     <div class="radio-container">
       <label for="radio1" class="radio">
@@ -94,7 +94,7 @@ export default class ProgressForm {
         <span class="radio__text">wasn't able to do either </span>
       </label>
     </div>
-      </br>
+      <br/>
     <p class="popup__text"><strong>How do you feel about your day?</strong></p>
 
     <div class="rating">
@@ -189,12 +189,12 @@ export default class ProgressForm {
       const validInputs = this.inputs.filter((input) => input.checked);
 
       if (this.boolean) {
-        alert("Data already submitted");
+        alert("You've already submitted an entry today!");
         return;
       }
 
       if (validInputs.length !== 2) {
-        alert("Both responses requried");
+        alert("Both responses are requried!");
         return;
       }
 

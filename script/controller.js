@@ -58,7 +58,6 @@ const initProgress = () => {
         data: data,
         id: config.STEPS_ID,
       };
-
       submitSteps(params);
     },
   });
@@ -94,9 +93,10 @@ const renderMain = () => {
       renderMenu();
       renderDashboard();
       //RENDER PAGINATION MUST BE INOVOKE AFTER TO TABLE
-      // renderPagination();
+      // initPagination();
       initProgress();
       initTracker();
+      initPagination();
       renderTable();
       renderFilter();
       renderCalendar();
@@ -162,10 +162,10 @@ const renderTable = () => {
     team: model.state.team,
     data: model.state.table,
     callbackPagination: (totalPage) => {
-      pagination.newPage(totalPage);
+      pagination.refresh(totalPage);
     },
     callbackInit: (totalPage) => {
-      renderPagination(totalPage);
+      pagination.show(totalPage);
     },
     callbackFilter: (boolean) => {
       filter.reset(boolean);
@@ -181,12 +181,12 @@ const renderFilter = () => {
 };
 
 // RENDER PAGINATION
-const renderPagination = (totalPage) => {
+const initPagination = (totalPage) => {
   pagination = new Pagination({
     container: sections[1],
     total: totalPage,
     callback: (page) => {
-      table.page(page);
+      table.pagination(page);
     },
   });
 };
@@ -243,7 +243,8 @@ const submitSteps = async (params) => {
     progress.successCallback(true);
     alert("Success! Today's PROGRESS has been recorded");
   } catch (error) {
-    errorCallback(error);
+    console.log("controller error");
+    progress.errorCallback(error.message);
   } finally {
   }
 };
@@ -255,7 +256,7 @@ const submitTracker = async (params) => {
     tracker.successCallback(true);
     alert("Success! Today's TRACKER has been recorded");
   } catch (error) {
-    errorCallback(error);
+    tracker.errorCallback(error);
   } finally {
   }
 };

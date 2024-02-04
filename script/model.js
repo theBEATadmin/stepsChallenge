@@ -32,11 +32,12 @@ export let state = {
     rows: [],
   },
   calendar: [],
+  attachment: "",
 };
 
 export const loadData = async function (params) {
   resetObject(params);
-  console.log(params);
+
   let formData = new FormData();
   formData.append("data", JSON.stringify(state));
 
@@ -63,13 +64,13 @@ export const loadData = async function (params) {
     }
 
     //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
-    if (state.userData.steps.length) {
+    if (state.userData.steps.length != 0) {
       processDashboardData();
     }
 
     //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
     //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
-    if (state.userData.tracker.length) {
+    if (state.userData.tracker.length !== 0) {
       state.calendar = getCalendarDates();
     }
 
@@ -80,56 +81,62 @@ export const loadData = async function (params) {
 };
 
 export const submitStepData = async function (params) {
-  let stepData = {
+  const stepsData = {
     username: state.username,
     registration: state.registration,
+    now: utils.standardDateFormat.format(config.DATE_TODAY),
+    date: utils.shortDateFormat.format(config.DATE_TODAY),
+    attachment: params.data.attachment,
     steps: params.data.steps,
     minutes: params.data.minutes,
     team: state.team,
-    now: utils.standardDateFormat.format(config.DATE_TODAY),
-    date: utils.shortDateFormat.format(config.DATE_TODAY),
   };
 
   let formData = new FormData();
-  formData.append("data", JSON.stringify(stepData));
+  formData.append("data", JSON.stringify(stepsData));
 
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
       { method: "POST", body: formData }
     );
+
     const data = await response.json();
 
     if (data.result == "failed") {
       throw Error(data.message);
     }
 
-    state.steps = data.data.steps;
+    state.steps = data.data;
+    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
     // ARRANGE DATA IF THERE ARE STEPS RECORD
     if (state.steps.length !== 0) {
-      state.userData.steps = getUserData(state.steps);
+      // state.participants.steps = getParticipantsData(state.steps);
+      // PROCESS TABLE DATA
+      processUserData();
     }
 
     //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
-    if (state.userData.steps.length) {
+    if (state.userData.steps.length != 0) {
       processDashboardData();
     }
   } catch (error) {
+    console.log("model error");
     throw Error(error);
   }
 };
 
 export const submitTrackerData = async function (params) {
-  let trackerData = {
+  const trackerData = {
     username: state.username,
     registration: state.registration,
-    steps: params.data.activity,
-    minutes: params.data.rating,
-    team: state.team,
     now: utils.standardDateFormat.format(config.DATE_TODAY),
     date: utils.shortDateFormat.format(config.DATE_TODAY),
+    activity: params.data.activity,
+    rating: params.data.rating,
+    team: state.team,
   };
 
   let formData = new FormData();
@@ -146,7 +153,7 @@ export const submitTrackerData = async function (params) {
       throw Error(data.message);
     }
 
-    state.tracker = data.data.tracker;
+    state.tracker = data.data;
     state.userData.tracker = getUserData(state.tracker);
     //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
     //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
@@ -199,6 +206,7 @@ const resetObject = (params) => {
       rows: [],
     },
     calendar: [],
+    attachment: "",
   };
 };
 
@@ -221,15 +229,12 @@ const arrangeTableData = () => {
 
 const getTableRows = (data) => {
   // GET THE USERNAME, team AND SUM OF THE TOTAL STEPS  OF EACH PARTICIPANT
-  let tableRow = state.participants.names.map((datumA) => {
-    // GET ALL RECORDS OF USER
-    let records = data.filter((datumB) => datumA.name === datumB.username);
-    return [
-      datumA.name,
-      records?.reduce((tot, acc) => (tot += acc.steps), 0),
-      datumA.team,
-    ];
-  });
+  let tableRow = utils
+    .deepCopy(state.participants.names)
+    .map((datumA, index) => {
+      let records = data.find((datumB) => datumA.name === datumB.username);
+      return [datumA.name, records ? records.steps : 0, datumA.team];
+    });
 
   //SORT BY NAME FIRST TO BREAK THE TIE
   tableRow.sort((a, b) => {
@@ -257,7 +262,6 @@ const getTableRows = (data) => {
 
   // SORT DATA BY RANKING
   tableRow.sort((a, b) => a[0] - b[0]);
-
   return tableRow;
 };
 

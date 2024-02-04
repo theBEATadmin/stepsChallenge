@@ -20,13 +20,13 @@ export default class MenuView {
       `afterbegin`,
       `<div class="menu-bar">
     <span class="menu-bar__link">
-      <span class="material-symbols-outlined"> dashboard </span>view
+      <span class="material-symbols-outlined"> dashboard </span>dashboard
     </span>
     <span class="menu-bar__link">
-      <span class="material-symbols-outlined"> calendar_today </span>tracker
+      <span class="material-symbols-outlined"> calendar_today </span>monitoring
     </span>
     <span class="menu-bar__link">
-      <span class="material-symbols-outlined"> mood </span> progress
+      <span class="material-symbols-outlined"> mood </span> tracker
     </span>
     <span class="menu-bar__link">
       <span class="material-symbols-outlined"> footprint </span> steps

@@ -59,14 +59,17 @@ export default class Table {
 
     // CONVERT NUMBER TO STRING FORM
     // STEPS IS AT INDEX  2
-    this.rankingTeam.forEach((datum) => {
-      datum[2] = this._formatNumber(datum[2]);
-    });
+    this._convert(this.rankingTeam);
+    this._convert(this.rankingAll);
+  }
 
-    this.rankingAll.forEach((datum) => {
+   _convert(data) {
+    data.forEach((datum) => {
+      datum[0] = datum[2] == 0 ? "-" : datum[0];
       datum[2] = this._formatNumber(datum[2]);
     });
   }
+  
   _formatNumber(num) {
     num = parseInt(num);
     if (isNaN(num) || num === 0) return "-";

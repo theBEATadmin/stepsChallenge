@@ -232,8 +232,16 @@ const getTableRows = (data) => {
   let tableRow = utils
     .deepCopy(state.participants.names)
     .map((datumA, index) => {
-      let records = data.find((datumB) => datumA.name === datumB.username);
-      return [datumA.name, records ? records.steps : 0, datumA.team];
+      let records = [];
+      records = data.filter((datumB) => datumA.name === datumB.username);
+      console.log(records);
+      return [
+        datumA.name,
+        records.length == 0
+          ? 0
+          : records.reduce((total, record) => total + record.steps, 0),
+        datumA.team,
+      ];
     });
 
   //SORT BY NAME FIRST TO BREAK THE TIE

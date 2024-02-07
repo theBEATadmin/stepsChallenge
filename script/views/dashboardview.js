@@ -54,7 +54,7 @@ export default class DashboardView {
                   )}</span>
                 </div>
                 <div class="dashboard-subcontent">
-                  <span class="dashboard-content__text">Totak Active Minutes</span>
+                  <span class="dashboard-content__text">Total Active Minutes</span>
                   <span class="dashboard-content__number">${this._formatNumber(
                     this.options.data.totMinutes
                   )}</span>

@@ -304,7 +304,7 @@ const computeTotSteps = (str) => {
 const computeAvgSteps = (str) => {
   if (state.userData.steps.length == 0 || isNaN(state.dashboard[str]))
     return "-";
-  return state.dashboard[str] / state.userData.steps.length;
+  return state.dashboard[str] / utils.countDays();
 };
 
 // CALENDAR DATA FUNCTION

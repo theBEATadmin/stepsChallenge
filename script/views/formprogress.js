@@ -40,7 +40,7 @@ export default class ProgressForm {
       this.options.username
     )} | Week ${utils.countWeeks()} of 8 | Day ${utils.countDays()} of 56 </h3>
     <br/>
-    <p class="popup__text">Active minutes is the total time you spent walking and/or duoing a workout</p>
+    <p class="popup__text">Active minutes is the total time you spent walking and/or doing a workout</p>
     <div class="form__inputs">
       <label for="stepsInp" class="form__label">Step:</label>
       <input id="stepsInp" type="number" name="steps" class="form__input"  autocomplete="off"/>

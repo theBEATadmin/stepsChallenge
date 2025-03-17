@@ -49,6 +49,7 @@ export const loadData = async function (params) {
       `https://script.google.com/macros/s/${params.id}/exec`,
       {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: formData,
       }
     );
@@ -113,7 +114,11 @@ export const submitStepData = async function (params) {
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData }
+      { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: formData 
+      }
     );
 
     const data = await response.json();
@@ -160,7 +165,11 @@ export const submitTrackerData = async function (params) {
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData }
+      { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: formData 
+      }
     );
     const data = await response.json();
 

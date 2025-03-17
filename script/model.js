@@ -46,13 +46,14 @@ export const loadData = async function (params) {
   try {
     // Make POST request to Google Apps Script endpoint
     const response = await fetch(
-      `https://script.google.com/macros/s/${params.id}/exec`,
+      `https://script.google.com/a/macros/thebeatstudio.net/s/${params.id}/exec`,
       {
         method: "POST",
         body: formData,
         mode: "no-cors"
       }
     );
+
     // Handle non-successful HTTP responses
     if (!response.ok) {
       throw new Error(`Network error: ${response.status} ${response.statusText}`);
@@ -111,7 +112,7 @@ export const submitStepData = async function (params) {
 
   try {
     const response = await fetch(
-      `https://script.google.com/macros/s/${params.id}/exec`,
+      `https://script.google.com/a/macros/thebeatstudio.net/s/${params.id}/exec`,
       { method: "POST", body: formData, mode: "no-cors" }
     );
 
@@ -158,7 +159,7 @@ export const submitTrackerData = async function (params) {
 
   try {
     const response = await fetch(
-      `https://script.google.com/macros/s/${params.id}/exec`,
+      `https://script.google.com/a/macros/thebeatstudio.net/s/${params.id}/exec`,
       { method: "POST", body: formData, mode: "no-cors", }
     );
     const data = await response.json();

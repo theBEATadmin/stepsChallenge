@@ -61,7 +61,6 @@ export const loadData = async function (params) {
     if (!response.ok) {
       throw new Error(`Network error: ${response.status} ${response.statusText}`);
     }
-
     const data = await response.json();
 
     // Handle errors returned by the API

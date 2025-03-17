@@ -53,7 +53,6 @@ export const loadData = async function (params) {
         mode: "no-cors"
       }
     );
-
     // Handle non-successful HTTP responses
     if (!response.ok) {
       throw new Error(`Network error: ${response.status} ${response.statusText}`);

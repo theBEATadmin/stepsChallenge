@@ -44,22 +44,35 @@ export const loadData = async function (params) {
   formData.append("data", JSON.stringify(state));
 
   try {
-    // Make POST request to Google Apps Script endpoint with no-cors mode
+    // Make POST request to Google Apps Script endpoint with valid headers
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
       {
         method: "POST",
         body: formData,
-        mode: "no-cors", // Set mode to no-cors to bypass CORS policy
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       }
     );
 
-    // Since no-cors mode is used, we cannot check response.ok or parse JSON
-    // Assume success and proceed with further processing
+    // Handle non-successful HTTP responses
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Handle errors returned by the API
+    if (data.result === "failed") {
+      throw new Error(`API error: ${data.message}`);
+    }
 
     // Update state with the response data
-    // Note: In no-cors mode, response data cannot be accessed directly
-    // Assuming the response data is handled elsewhere or not needed here
+    state = data.data;
+
+    // HARDCODED BECAUSE TOO MANY KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
     // If there are recorded steps, process related data
@@ -103,10 +116,24 @@ export const submitStepData = async function (params) {
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData, mode: "no-cors" } // Set mode to no-cors
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
 
-    // Assume success due to no-cors mode
+    const data = await response.json();
+
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+
+    state.steps = data.data;
+    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
     // ARRANGE DATA IF THERE ARE STEPS RECORD
@@ -141,12 +168,23 @@ export const submitTrackerData = async function (params) {
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData, mode: "no-cors" } // Set mode to no-cors
+      {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
     );
+    const data = await response.json();
 
-    // Assume success due to no-cors mode
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+
+    state.tracker = data.data;
     state.userData.tracker = getUserData(state.tracker);
-
     //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
     if (state.userData.tracker.length) {
       state.calendar = getCalendarDates();

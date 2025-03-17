@@ -44,22 +44,30 @@ export const loadData = async function (params) {
   formData.append("data", JSON.stringify(state));
 
   try {
-    // Make POST request to Google Apps Script endpoint with 'no-cors' mode
+    // Make POST request to Google Apps Script endpoint
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
       {
         method: "POST",
         body: formData,
-        mode: "no-cors",
+        mode: "no-cors"
       }
     );
 
-    // Since 'no-cors' mode is used, we cannot check response.ok or parse JSON
-    // Assume success and proceed with further processing
+    // Handle non-successful HTTP responses
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Handle errors returned by the API
+    if (data.result === "failed") {
+      throw new Error(`API error: ${data.message}`);
+    }
 
     // Update state with the response data
-    // Note: This part will not work as expected due to 'no-cors' mode limitations
-    // state = data.data;
+    state = data.data;
 
     // HARDCODED BECAUSE TOO MANY KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
@@ -108,10 +116,13 @@ export const submitStepData = async function (params) {
       { method: "POST", body: formData, mode: "no-cors" }
     );
 
-    // Since 'no-cors' mode is used, we cannot check response.ok or parse JSON
-    // Assume success and proceed with further processing
+    const data = await response.json();
 
-    // state.steps = data.data;
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
+
+    state.steps = data.data;
     // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
@@ -149,13 +160,15 @@ export const submitTrackerData = async function (params) {
   try {
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData, mode: "no-cors" }
+      { method: "POST", body: formData, mode: "no-cors", }
     );
+    const data = await response.json();
 
-    // Since 'no-cors' mode is used, we cannot check response.ok or parse JSON
-    // Assume success and proceed with further processing
+    if (data.result == "failed") {
+      throw Error(data.message);
+    }
 
-    // state.tracker = data.data;
+    state.tracker = data.data;
     state.userData.tracker = getUserData(state.tracker);
     //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
     //CALENDAR MODULE MATCHES DATE USING TIME FORMAT

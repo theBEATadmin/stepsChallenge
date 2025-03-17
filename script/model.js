@@ -35,50 +35,65 @@ export let state = {
   attachment: "",
 };
 
+// Function to load and process data from Google Apps Script
 export const loadData = async function (params) {
-  resetObject(params);
+  resetObject(params); // Reset the object based on the provided params
 
+  // Prepare form data with the current state
   let formData = new FormData();
   formData.append("data", JSON.stringify(state));
 
   try {
+    // Make POST request to Google Apps Script endpoint
     const response = await fetch(
       `https://script.google.com/macros/s/${params.id}/exec`,
-      { method: "POST", body: formData }
+      {
+        method: "POST",
+        body: formData,
+      }
     );
+
+    // Handle non-successful HTTP responses
+    if (!response.ok) {
+      throw new Error(`Network error: ${response.status} ${response.statusText}`);
+    }
+
     const data = await response.json();
 
-    if (data.result == "failed") {
-      throw Error(data.message);
+    // Handle errors returned by the API
+    if (data.result === "failed") {
+      throw new Error(`API error: ${data.message}`);
     }
+
+    // Update state with the response data
     state = data.data;
 
-    // HARDCODED BECAUSE TOO MUCH KEYS TO REMOVE FROM ORIGINAL OBJECT
+    // HARDCODED BECAUSE TOO MANY KEYS TO REMOVE FROM ORIGINAL OBJECT
     arrangeTableData();
 
-    // ARRANGE DATA IF THERE ARE STEPS RECORD
-    if (state.steps.length !== 0) {
-      // state.participants.steps = getParticipantsData(state.steps);
-      // PROCESS TABLE DATA
+    // If there are recorded steps, process related data
+    if (state.steps?.length) {
       processUserData();
     }
 
-    //PROCESS DATA FOR DASHBOARD IF USER HAS STEPS RECORDS
-    if (state.userData.steps.length != 0) {
+    // Process dashboard data if user has steps records
+    if (state.userData?.steps?.length) {
       processDashboardData();
     }
 
-    //PROCESS DATA FOR CALENDAR DATA IF USER HAS TRACKER RECORDS
-    //CALENDAR MODULE MATCHES DATE USING TIME FORMAT
-    if (state.userData.tracker.length !== 0) {
+    // Process calendar data if tracker records are available
+    if (state.userData?.tracker?.length) {
       state.calendar = getCalendarDates();
     }
 
+    // Persist params to localStorage
     localStorage.setItem("params", JSON.stringify(params));
   } catch (error) {
-    throw Error(error);
+    console.error("Error in loadData:", error.message);
+    throw error; // Re-throw for further handling
   }
 };
+
 
 export const submitStepData = async function (params) {
   const stepsData = {
